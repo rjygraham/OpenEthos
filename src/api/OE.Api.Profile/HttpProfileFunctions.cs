@@ -7,11 +7,11 @@ using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using ModelsProfile = Open.Models.Profile;
+using ModelsProfile = OE.Models.Profile;
 
-namespace Open.Api.Profile
+namespace OE.Api.Profile
 {
-	public class Function1
+	public class HttpProfileFunctions
 	{
 		private string mockId = "69b918ec-69bb-489c-be71-2900e6a8cbe7";
 
