@@ -30,7 +30,8 @@ namespace OE.Mobile
 		{
 			containerRegistry.RegisterForNavigation<MainPage, MainPageViewModel>();
 
-			containerRegistry.RegisterInstance<IProfileApiService>(RestService.For<IProfileApiService>("https://66d47af52655.ngrok.io"));
+			containerRegistry.RegisterSingleton<IAuthenticationService, MsalAuthenticationService>();
+			containerRegistry.RegisterInstance<IProfileApiService>(RestService.For<IProfileApiService>("https://twitch-openethos-dev-apim.azure-api.net"));
 		}
 	}
 }
