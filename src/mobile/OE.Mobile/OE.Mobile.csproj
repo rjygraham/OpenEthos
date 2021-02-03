@@ -31,48 +31,10 @@
 		</Compile>
 	</ItemGroup>
 
-	<UsingTask TaskName="ReplaceSecrets" TaskFactory="RoslynCodeTaskFactory" AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.Core.dll">
-		<ParameterGroup>
-			<Files ParameterType="Microsoft.Build.Framework.ITaskItem[]" Required="true" />
-			<TargetFileName ParameterType="System.String" Required="true" />
-			<Placeholders ParameterType="System.String" Required="true" />
-		</ParameterGroup>
-		<Task>
-			<Using Namespace="System" />
-			<Using Namespace="System.IO" />
-			<Using Namespace="System.Text.RegularExpressions" />
-			<Code Type="Fragment" Language="cs">
-				<![CDATA[
-					if (Files.Length > 0 && !string.IsNullOrEmpty(TargetFileName))  
-					{
-						for (int i = 0; i < Files.Length; i++)  
-						{
-							ITaskItem item = Files[i];
-							string path = item.GetMetadata("FullPath");
-							if (TargetFileName.Equals(Path.GetFileName(path)))
-							{
-								string generatedPath = path.Replace(".cs", ".g.cs");
-								string content = File.ReadAllText(path);
-								
-								string[] placeholders = Placeholders.Split(',');
-								foreach(string placeholder in placeholders)
-								{
-									content = Regex.Replace(content, $"\\${placeholder}\\$", Environment.GetEnvironmentVariable(placeholder));
-								}
-								File.WriteAllText(generatedPath, content);
-								Files[i] = new TaskItem(Path.GetFileName(generatedPath));
-
-								return true;
-							}
-						}
-					}
-				]]>
-			</Code>
-		</Task>
-	</UsingTask>
+	<UsingTask TaskName="OE.Build.ReplaceSecretsTask" AssemblyFile="..\..\..\build\OE.Build\bin\Debug\netstandard2.0\OE.Build.dll" />
 
 	<Target Name="PreBuild" BeforeTargets="CoreCompile">
-		<ReplaceSecrets Files="@(Compile)" TargetFileName="Constants.cs" Placeholders="B2C_TENANTID,B2C_HOSTNAME,B2C_CLIENTID,B2C_SUSI_POLICY,XAM_MOBILE_APPID,XAM_ANDROID_SIGHASH" />
+		<ReplaceSecretsTask Files="@(Compile)" TargetFileName="Constants.cs" Placeholders="B2C_TENANTID,B2C_HOSTNAME,B2C_CLIENTID,B2C_SUSI_POLICY,XAM_MOBILE_APPID,XAM_ANDROID_SIGHASH" />
 		<ItemGroup>
 			<Compile Remove="Constants.cs" />
 		</ItemGroup>
