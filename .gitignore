@@ -429,3 +429,6 @@ MigrationBackup/
 .ionide/
 
 # End of https://www.toptal.com/developers/gitignore/api/visualstudio,visualstudiocode,xamarinstudio,windows,macos
+
+# Specific generated code files
+Constants.g.cs
