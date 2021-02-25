@@ -13,12 +13,14 @@ namespace OE.Mobile
 			public const string Tenant = "$B2C_TENANTID$";
 			public const string AzureADB2CHostname = "$B2C_HOSTNAME$";
 			public const string ClientId = "$B2C_CLIENTID$";
-			public const string PolicySignUpSignIn = "$B2C_SUSI_POLICY$";
+			public const string PolicySignUp = "$B2C_SU_POLICY$";
+			public const string PolicySignIn = "$B2C_SI_POLICY$";
 
 			public static string[] Scopes = { "openid", "profile", "offline_access", $"https://{Tenant}/api/profile" };
 
 			public static string AuthorityBase = $"https://{AzureADB2CHostname}/tfp/{Tenant}/";
-			public static string AuthoritySignInSignUp = $"{AuthorityBase}{PolicySignUpSignIn}";
+			public static string AuthoritySignUp = $"{AuthorityBase}{PolicySignUp}";
+			public static string AuthoritySignIn = $"{AuthorityBase}{PolicySignIn}";
 
 			public static string AppId = "$XAM_MOBILE_APPID$";
 

@@ -1,26 +1,23 @@
-﻿using System;
-
-using Android.App;
+﻿using Android.App;
+using Android.Content;
 using Android.Content.PM;
-using Android.Runtime;
-using Android.Views;
-using Android.Widget;
 using Android.OS;
-using Prism;
-using Prism.Ioc;
+using Android.Runtime;
+using Microsoft.Identity.Client;
+using OE.Mobile.Droid.Services;
 using OE.Mobile.Services;
 using Plugin.CurrentActivity;
-using OE.Mobile.Droid.Services;
-using Microsoft.Identity.Client;
-using Android.Content;
+using Prism;
+using Prism.Ioc;
 
 namespace OE.Mobile.Droid
 {
-    [Activity(Label = "OpenEthos", Icon = "@mipmap/icon", Theme = "@style/MainTheme", MainLauncher = true, ConfigurationChanges = ConfigChanges.ScreenSize | ConfigChanges.Orientation | ConfigChanges.UiMode | ConfigChanges.ScreenLayout | ConfigChanges.SmallestScreenSize )]
+	[IntentFilter(new[] { Intent.ActionView }, Categories = new[] { Intent.CategoryBrowsable, Intent.CategoryDefault }, DataScheme = "https", DataHost = "www.openethos.io", DataPathPrefix = "/app", AutoVerify = true)]
+	[Activity(Label = "OpenEthos", Icon = "@mipmap/icon", Theme = "@style/MainTheme", MainLauncher = true, ConfigurationChanges = ConfigChanges.ScreenSize | ConfigChanges.Orientation | ConfigChanges.UiMode | ConfigChanges.ScreenLayout | ConfigChanges.SmallestScreenSize )]
     public class MainActivity : global::Xamarin.Forms.Platform.Android.FormsAppCompatActivity, IPlatformInitializer
 	{
         protected override void OnCreate(Bundle savedInstanceState)
-        {
+        { 
             TabLayoutResource = Resource.Layout.Tabbar;
             ToolbarResource = Resource.Layout.Toolbar;
 

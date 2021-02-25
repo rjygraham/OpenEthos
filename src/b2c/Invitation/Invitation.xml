@@ -1,0 +1,37 @@
+﻿<TrustFrameworkPolicy
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+  xmlns="http://schemas.microsoft.com/online/cpim/schemas/2013/06"
+  PolicySchemaVersion="0.3.0.0"
+  TenantId="{{B2C_TENANTID}}"
+  PolicyId="B2C_1A_Invitation"
+  PublicPolicyUri="http://{{B2C_TENANTID}}/B2C_1A_Invitation"
+  TenantObjectId="b623b5db-c160-410c-ab98-5c8bb4d0a06c">
+
+  <BasePolicy>
+    <TenantId>{{B2C_TENANTID}}</TenantId>
+    <PolicyId>B2C_1A_Invitation_TrustFrameworkExtensions</PolicyId>
+  </BasePolicy>
+
+  <RelyingParty>
+    <DefaultUserJourney ReferenceId="SignUpOrSignIn" />
+    <UserJourneyBehaviors>
+      <ContentDefinitionParameters>
+        <Parameter Name="ui_locales">{Culture:RFC5646}</Parameter>
+      </ContentDefinitionParameters>
+    </UserJourneyBehaviors>
+    <TechnicalProfile Id="PolicyProfile">
+      <DisplayName>PolicyProfile</DisplayName>
+      <Protocol Name="OpenIdConnect" />
+      <OutputClaims>
+        <OutputClaim ClaimTypeReferenceId="displayName" />
+        <OutputClaim ClaimTypeReferenceId="givenName" />
+        <OutputClaim ClaimTypeReferenceId="surname" />
+        <OutputClaim ClaimTypeReferenceId="email" />
+        <OutputClaim ClaimTypeReferenceId="objectId" PartnerClaimType="sub" />
+      </OutputClaims>
+      <SubjectNamingInfo ClaimType="sub" />
+    </TechnicalProfile>
+  </RelyingParty>
+
+</TrustFrameworkPolicy>

@@ -20,7 +20,7 @@ namespace OE.Mobile.Services
 			publicClientApplication = new Lazy<IPublicClientApplication>(() =>
 			{
 				var builder = PublicClientApplicationBuilder.Create(Constants.AuthenticationSettings.ClientId)
-				   .WithB2CAuthority(Constants.AuthenticationSettings.AuthoritySignInSignUp);
+				   .WithB2CAuthority(Constants.AuthenticationSettings.AuthoritySignIn);
 
 				switch (Device.RuntimePlatform)
 				{
@@ -37,7 +37,6 @@ namespace OE.Mobile.Services
 					default:
 						break;
 				}
-
 				return builder.Build();
 			});
 		}
@@ -108,8 +107,8 @@ namespace OE.Mobile.Services
 		private async Task<string> AcquireTokenSilentAsync()
 		{
 			IEnumerable<IAccount> accounts = await publicClientApplication.Value.GetAccountsAsync();
-			AuthenticationResult authResult = await publicClientApplication.Value.AcquireTokenSilent(Constants.AuthenticationSettings.Scopes, GetAccountByPolicy(accounts, Constants.AuthenticationSettings.PolicySignUpSignIn))
-			   .WithB2CAuthority(Constants.AuthenticationSettings.AuthoritySignInSignUp)
+			AuthenticationResult authResult = await publicClientApplication.Value.AcquireTokenSilent(Constants.AuthenticationSettings.Scopes, GetAccountByPolicy(accounts, Constants.AuthenticationSettings.PolicySignIn))
+			   .WithB2CAuthority(Constants.AuthenticationSettings.AuthoritySignIn)
 			   .ExecuteAsync();
 
 			return authResult.AccessToken;
@@ -122,7 +121,8 @@ namespace OE.Mobile.Services
 			try
 			{
 				var authResult = await publicClientApplication.Value.AcquireTokenInteractive(Constants.AuthenticationSettings.Scopes)
-					.WithAccount(GetAccountByPolicy(accounts, Constants.AuthenticationSettings.PolicySignUpSignIn))
+					.WithUseEmbeddedWebView(true)
+					.WithAccount(GetAccountByPolicy(accounts, Constants.AuthenticationSettings.PolicySignIn))
 					//.WithExtraQueryParameters($"domain_hint={domain}")
 					.ExecuteAsync();
 
@@ -146,6 +146,44 @@ namespace OE.Mobile.Services
 			}
 
 			return null;
+		}
+
+		public async Task<bool> SignUpAsync(string idTokenHint, string domainHint)
+		{
+			var accounts = await publicClientApplication.Value.GetAccountsAsync();
+
+			try
+			{
+				var authResult = await publicClientApplication.Value.AcquireTokenInteractive(Constants.AuthenticationSettings.Scopes)
+					.WithUseEmbeddedWebView(true)
+					.WithB2CAuthority(Constants.AuthenticationSettings.AuthoritySignUp)
+					.WithAccount(GetAccountByPolicy(accounts, Constants.AuthenticationSettings.PolicySignIn))
+					.WithExtraQueryParameters(new Dictionary<string, string>
+					{
+						{ "domain_hint", domainHint },
+						{ "id_token_hint", idTokenHint }
+					})
+					.ExecuteAsync();
+
+				AccessToken = authResult.AccessToken;
+				return true;
+			}
+			catch (MsalClientException mcex)
+			{
+				if (mcex.ErrorCode.Equals("authentication_canceled", StringComparison.OrdinalIgnoreCase))
+				{
+					// user cancelled authentication.
+				}
+			}
+			catch (MsalServiceException msex)
+			{
+				if (msex.ErrorCode.Equals("access_denied", StringComparison.OrdinalIgnoreCase))
+				{
+					// user cancelled self-assertion.
+				}
+			}
+
+			return false;
 		}
 	}
 }

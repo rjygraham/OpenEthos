@@ -11,7 +11,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Microsoft.Identity.Client" Version="4.25.0" />
+		<PackageReference Include="Microsoft.Identity.Client" Version="4.27.0" />
 		<PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
 		<PackageReference Include="Prism.DryIoc.Forms" Version="8.0.0.1909" />
 		<PackageReference Include="Refit" Version="5.2.4" />
@@ -31,10 +31,16 @@
 		</Compile>
 	</ItemGroup>
 
+	<ItemGroup>
+	  <EmbeddedResource Update="Views\SignUpPage.xaml">
+	    <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+	  </EmbeddedResource>
+	</ItemGroup>
+
 	<UsingTask TaskName="OE.Build.ReplaceSecretsTask" AssemblyFile="..\..\..\build\OE.Build\bin\Debug\netstandard2.0\OE.Build.dll" />
 
 	<Target Name="PreBuild" BeforeTargets="CoreCompile">
-		<ReplaceSecretsTask Files="@(Compile)" TargetFileName="Constants.cs" Placeholders="B2C_TENANTID,B2C_HOSTNAME,B2C_CLIENTID,B2C_SUSI_POLICY,XAM_MOBILE_APPID,XAM_ANDROID_SIGHASH" />
+		<ReplaceSecretsTask Files="@(Compile)" TargetFileName="Constants.cs" Placeholders="B2C_TENANTID,B2C_HOSTNAME,B2C_CLIENTID,B2C_SU_POLICY,B2C_SI_POLICY,XAM_MOBILE_APPID,XAM_ANDROID_SIGHASH" />
 		<ItemGroup>
 			<Compile Remove="Constants.cs" />
 		</ItemGroup>
