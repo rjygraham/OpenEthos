@@ -16,9 +16,85 @@
 	</BasePolicy>
 	<BuildingBlocks>
 
+		<ClaimsSchema>
+		
+			<!-- SECTION IV: Invitation claims -->
+
+			<ClaimType Id="inviteEmail">
+				<DisplayName>Invite Email</DisplayName>
+				<DataType>string</DataType>
+				<UserHelpText />
+			</ClaimType>
+
+			<ClaimType Id="extension_ancestorId">
+				<DisplayName>extension_ancestorId</DisplayName>
+				<DataType>string</DataType>
+				<UserHelpText />
+			</ClaimType>
+
+			<ClaimType Id="extension_sponsorId">
+				<DisplayName>extension_sponsorId</DisplayName>
+				<DataType>string</DataType>
+				<UserHelpText />
+			</ClaimType>
+
+		</ClaimsSchema>
+
 	</BuildingBlocks>
 
 	<ClaimsProviders>
+
+		<ClaimsProvider>
+			<DisplayName>Azure Active Directory</DisplayName>
+			<TechnicalProfiles>
+
+				<TechnicalProfile Id="AAD-Common">
+					<DisplayName>Azure Active Directory</DisplayName>
+					<Protocol Name="Proprietary" Handler="Web.TPEngine.Providers.AzureActiveDirectoryProvider, Web.TPEngine, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" />
+
+					<CryptographicKeys>
+						<Key Id="issuer_secret" StorageReferenceId="B2C_1A_TokenSigningKeyContainer" />
+					</CryptographicKeys>
+
+					<!-- We need this here to suppress the SelfAsserted provider from invoking SSO on validation profiles. -->
+					<IncludeInSso>false</IncludeInSso>
+					<UseTechnicalProfileForSessionManagement ReferenceId="SM-Noop" />
+				</TechnicalProfile>
+
+				<!-- Technical profiles for social logins -->
+
+				<TechnicalProfile Id="AAD-UserWriteUsingAlternativeSecurityId">
+					<PersistedClaims>
+						<!-- Required claims -->
+						<PersistedClaim ClaimTypeReferenceId="extension_ancestorId" />
+						<PersistedClaim ClaimTypeReferenceId="extension_sponsorId" />
+					</PersistedClaims>
+					<OutputClaims>
+						<OutputClaim ClaimTypeReferenceId="extension_ancestorId" Required="true" />
+						<OutputClaim ClaimTypeReferenceId="extension_sponsorId" Required="true" />
+					</OutputClaims>
+				</TechnicalProfile>
+
+				<TechnicalProfile Id="AAD-UserReadUsingAlternativeSecurityId">
+					<OutputClaims>
+						<!-- Required claims -->
+						<OutputClaim ClaimTypeReferenceId="extension_ancestorId" Required="true" />
+						<OutputClaim ClaimTypeReferenceId="extension_sponsorId" Required="true" />
+					</OutputClaims>
+				</TechnicalProfile>
+
+				<!-- The following technical profile is used to read data after user authenticates. -->
+				<TechnicalProfile Id="AAD-UserReadUsingObjectId">
+					<OutputClaims>
+						<!-- Required claims -->
+						<OutputClaim ClaimTypeReferenceId="extension_ancestorId" Required="true" />
+						<OutputClaim ClaimTypeReferenceId="extension_sponsorId" Required="true" />
+					</OutputClaims>
+				</TechnicalProfile>
+
+			</TechnicalProfiles>
+			
+		</ClaimsProvider>
 
 		<ClaimsProvider>
 			<Domain>live.com</Domain>

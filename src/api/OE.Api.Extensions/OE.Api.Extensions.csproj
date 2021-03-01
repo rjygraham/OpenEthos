@@ -1,0 +1,12 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\shared\OE.Models.ActivityStreams\OE.Models.ActivityStreams.csproj" />
+    <ProjectReference Include="..\OE.Api.Data\OE.Api.Data.csproj" />
+  </ItemGroup>
+
+</Project>

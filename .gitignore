@@ -432,3 +432,6 @@ MigrationBackup/
 
 # Specific generated code files
 Constants.g.cs
+
+# B2C deployment files.
+src/b2c/Deploy

@@ -1,0 +1,8 @@
+{
+    "IsEncrypted": false,
+	"Values": {
+		"AzureWebJobsStorage": "UseDevelopmentStorage=true",
+		"FUNCTIONS_WORKER_RUNTIME": "dotnet",
+		"CosmosDbSqlConnection": "AccountEndpoint=https://twitch-openethos-dev-cosmos.documents.azure.com:443/;AccountKey=EHIIrTm7kspsQuWdOAGoAoWys65SiZvvTxtop9A0gXGPXdPfuJ6e4E8xc60tEIMPdlddo8sm5I7xKIWYsSbiQg==;"
+	}
+}

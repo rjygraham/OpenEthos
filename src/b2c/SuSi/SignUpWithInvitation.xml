@@ -16,6 +16,7 @@
 	</BasePolicy>
 
 	 <BuildingBlocks>
+
 		<ClaimsSchema>
 			<!--Sample: Stores the error message for unsolicited request (a request without id_token_hint) and user not found-->
 			<ClaimType Id="errorMessage">
@@ -24,6 +25,7 @@
 				<UserHelpText>Add help text here</UserHelpText>
 		 		<UserInputType>Paragraph</UserInputType>
 			</ClaimType>
+
 		</ClaimsSchema>
 
 		<ClaimsTransformations>
@@ -59,10 +61,46 @@
 						<Key Id="client_secret" StorageReferenceId="{{B2C_ID_TOKEN_HINT_CERT}}" />
 					</CryptographicKeys>
 					<OutputClaims>
-						<!--Sample: Read the email cliam from the id_token_hint-->
+						<!-- Read the claims from the id_token_hint -->
 						<OutputClaim ClaimTypeReferenceId="email" />
-						<OutputClaim ClaimTypeReferenceId="sponsor" />
 					</OutputClaims>
+				</TechnicalProfile>
+			</TechnicalProfiles>
+		</ClaimsProvider>
+
+		<ClaimsProvider>
+			<DisplayName>REST APIs</DisplayName>
+			<TechnicalProfiles>
+				<TechnicalProfile Id="REST-GetInvitation">
+					<DisplayName>Get Invitation</DisplayName>
+					<Protocol Name="Proprietary" Handler="Web.TPEngine.Providers.RestfulProvider, Web.TPEngine, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" />
+					<Metadata>
+						<Item Key="ServiceUrl">https://5fc1b386dfd2.ngrok.io/api/invitations/get</Item>
+						<Item Key="AuthenticationType">None</Item>
+						<Item Key="SendClaimsIn">Body</Item>
+					</Metadata>
+					<InputClaims>
+						<InputClaim ClaimTypeReferenceId="email" />
+					</InputClaims>
+					<OutputClaims>
+						<OutputClaim ClaimTypeReferenceId="extension_ancestorId" PartnerClaimType="ancestor" />
+						<OutputClaim ClaimTypeReferenceId="extension_sponsorId" PartnerClaimType="sponsor" />
+					</OutputClaims>
+					<UseTechnicalProfileForSessionManagement ReferenceId="SM-Noop" />
+				</TechnicalProfile>
+
+				<TechnicalProfile Id="REST-RedeemInvitation">
+					<DisplayName>Get Invitation</DisplayName>
+					<Protocol Name="Proprietary" Handler="Web.TPEngine.Providers.RestfulProvider, Web.TPEngine, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" />
+					<Metadata>
+						<Item Key="ServiceUrl">https://5fc1b386dfd2.ngrok.io/api/invitations/redeem</Item>
+						<Item Key="AuthenticationType">None</Item>
+						<Item Key="SendClaimsIn">Body</Item>
+					</Metadata>
+					<InputClaims>
+						<InputClaim ClaimTypeReferenceId="email" />
+					</InputClaims>
+					<UseTechnicalProfileForSessionManagement ReferenceId="SM-Noop" />
 				</TechnicalProfile>
 			</TechnicalProfiles>
 		</ClaimsProvider>
@@ -70,6 +108,27 @@
 		<ClaimsProvider>
 			<DisplayName>Self Asserted</DisplayName>
 			<TechnicalProfiles>
+
+				<TechnicalProfile Id="SelfAsserted-Social">
+					<InputClaims>
+						<!-- These claims ensure that any values retrieved in the previous steps (e.g. from an external IDP) are prefilled. 
+							Note that some of these claims may not have any value, for example, if the external IDP did not provide any of
+							these values, or if the claim did not appear in the OutputClaims section of the IDP.
+							In addition, if a claim is not in the InputClaims section, but it is in the OutputClaims section, then its
+							value will not be prefilled, but the user will still be prompted for it (with an empty value). -->
+					</InputClaims>
+					<OutputClaims>
+						<!-- These claims are not shown to the user because their value is obtained through the "ValidationTechnicalProfiles"
+							referenced below, or a default value is assigned to the claim. A claim is only shown to the user to provide a 
+							value if its value cannot be obtained through any other means. -->
+							<OutputClaim ClaimTypeReferenceId="displayName" />
+					</OutputClaims>
+					<ValidationTechnicalProfiles>
+						<ValidationTechnicalProfile ReferenceId="REST-GetInvitation" />
+						<ValidationTechnicalProfile ReferenceId="REST-RedeemInvitation" />
+					</ValidationTechnicalProfiles>
+				</TechnicalProfile>
+
 				<!-- Show error message-->
 				<TechnicalProfile Id="SelfAsserted-Error">
 					<DisplayName>Unsolicited error message</DisplayName>
@@ -108,7 +167,7 @@
 
 				<!-- Validate user has invitation -->
 				<OrchestrationStep Order="2" Type="ClaimsExchange">
-				 <Preconditions>
+				 	<Preconditions>
 						<Precondition Type="ClaimsExist" ExecuteActionsIf="true">
 							<Value>email</Value>
 							<Action>SkipThisOrchestrationStep</Action>
@@ -170,29 +229,27 @@
 				</OrchestrationStep>
 
 				<!-- Issue the access token -->
-				<OrchestrationStep Order="8" Type="SendClaims" CpimIssuerTechnicalProfileReferenceId="JwtIssuer"/>
+				<OrchestrationStep Order="8" Type="SendClaims" CpimIssuerTechnicalProfileReferenceId="JwtIssuer" />
 		
 			</OrchestrationSteps>
-			<ClientDefinition ReferenceId="DefaultWeb"/>
+			<ClientDefinition ReferenceId="DefaultWeb" />
 		</UserJourney>
 	</UserJourneys>
 
 	<RelyingParty>
 		<DefaultUserJourney ReferenceId="InvitationSignUp" />
 		<UserJourneyBehaviors>
-				<JourneyInsights TelemetryEngine="ApplicationInsights" InstrumentationKey="{{B2C_APPINSIGHTS_INSTRUMENTATIONKEY}}" DeveloperMode="{{B2C_APPINSIGHTS_DEVELOPERMODE}}" ClientEnabled="false" ServerEnabled="true" TelemetryVersion="1.0.0" />
+			<JourneyInsights TelemetryEngine="ApplicationInsights" InstrumentationKey="{{B2C_APPINSIGHTS_INSTRUMENTATIONKEY}}" DeveloperMode="{{B2C_APPINSIGHTS_DEVELOPERMODE}}" ClientEnabled="false" ServerEnabled="true" TelemetryVersion="1.0.0" />
 		</UserJourneyBehaviors>
 		<TechnicalProfile Id="PolicyProfile">
 			<DisplayName>PolicyProfile</DisplayName>
 			<Protocol Name="OpenIdConnect" />
-			<!--Sample: Set the input claims to be read from the id_token_hint-->
 			<InputClaims>
 				<InputClaim ClaimTypeReferenceId="email" />
-				<InputClaim ClaimTypeReferenceId="extension_sponsorId" />
-				<InputClaim ClaimTypeReferenceId="displayName" />
 			</InputClaims>
 			<OutputClaims>
 				<OutputClaim ClaimTypeReferenceId="email" />
+				<OutputClaim ClaimTypeReferenceId="extension_ancestorId" PartnerClaimType="ancestor" />
 				<OutputClaim ClaimTypeReferenceId="extension_sponsorId" PartnerClaimType="sponsor" />
 				<OutputClaim ClaimTypeReferenceId="displayName" PartnerClaimType="name" />
 				<OutputClaim ClaimTypeReferenceId="objectId" PartnerClaimType="sub" />

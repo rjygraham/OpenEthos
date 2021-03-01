@@ -1,37 +1,68 @@
 ﻿<TrustFrameworkPolicy
-  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-  xmlns="http://schemas.microsoft.com/online/cpim/schemas/2013/06"
-  PolicySchemaVersion="0.3.0.0"
-  TenantId="{{B2C_TENANTID}}"
-  PolicyId="B2C_1A_Invitation"
-  PublicPolicyUri="http://{{B2C_TENANTID}}/B2C_1A_Invitation"
-  TenantObjectId="b623b5db-c160-410c-ab98-5c8bb4d0a06c">
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+xmlns="http://schemas.microsoft.com/online/cpim/schemas/2013/06"
+PolicySchemaVersion="0.3.0.0"
+TenantId="{{B2C_TENANTID}}"
+PolicyId="B2C_1A_Invitation"
+PublicPolicyUri="http://{{B2C_TENANTID}}/B2C_1A_Invitation"
+TenantObjectId="b623b5db-c160-410c-ab98-5c8bb4d0a06c">
 
-  <BasePolicy>
-    <TenantId>{{B2C_TENANTID}}</TenantId>
-    <PolicyId>B2C_1A_Invitation_TrustFrameworkExtensions</PolicyId>
-  </BasePolicy>
+	<BasePolicy>
+		<TenantId>{{B2C_TENANTID}}</TenantId>
+		<PolicyId>B2C_1A_TrustFrameworkExtensions</PolicyId>
+	</BasePolicy>
 
-  <RelyingParty>
-    <DefaultUserJourney ReferenceId="SignUpOrSignIn" />
-    <UserJourneyBehaviors>
-      <ContentDefinitionParameters>
-        <Parameter Name="ui_locales">{Culture:RFC5646}</Parameter>
-      </ContentDefinitionParameters>
-    </UserJourneyBehaviors>
-    <TechnicalProfile Id="PolicyProfile">
-      <DisplayName>PolicyProfile</DisplayName>
-      <Protocol Name="OpenIdConnect" />
-      <OutputClaims>
-        <OutputClaim ClaimTypeReferenceId="displayName" />
-        <OutputClaim ClaimTypeReferenceId="givenName" />
-        <OutputClaim ClaimTypeReferenceId="surname" />
-        <OutputClaim ClaimTypeReferenceId="email" />
-        <OutputClaim ClaimTypeReferenceId="objectId" PartnerClaimType="sub" />
-      </OutputClaims>
-      <SubjectNamingInfo ClaimType="sub" />
-    </TechnicalProfile>
-  </RelyingParty>
+	<ClaimsProviders>
+		<!-- variant of default JwtIssuer to lower the token lifetime for the invite we send -->
+		<ClaimsProvider>
+		<DisplayName>Token Issuer</DisplayName>
+		<TechnicalProfiles>
+			<TechnicalProfile Id="JwtIssuerInvite">
+			<DisplayName>JWT Issuer Invite</DisplayName>
+			<Metadata>
+				<Item Key="id_token_lifetime_secs">172800</Item> <!-- 900 secs = 15 min -->
+				<Item Key="token_lifetime_secs">172800</Item>
+				<Item Key="refresh_token_lifetime_secs">172800</Item>
+			</Metadata>
+			<CryptographicKeys>
+				<Key Id="issuer_secret" StorageReferenceId="B2C_1A_TokenHintCert" />
+				<Key Id="issuer_refresh_token_key" StorageReferenceId="B2C_1A_TokenEncryptionKeyContainer" />
+			</CryptographicKeys>
+			<InputClaims />
+			<OutputClaims />
+			<IncludeTechnicalProfile ReferenceId="JwtIssuer" />
+			</TechnicalProfile>
+		</TechnicalProfiles>
+		</ClaimsProvider>
+	</ClaimsProviders>
+
+	<UserJourneys>
+		<!-- this mini-userjourney will generate a signed JWT that can be sent in an email. 
+			Do NOT intruduce anything that will cause a UX to be displayed as that will break this
+		-->
+		<UserJourney Id="GenerateInviteToken">    
+		<OrchestrationSteps>
+			<OrchestrationStep Order="1" Type="SendClaims" CpimIssuerTechnicalProfileReferenceId="JwtIssuerInvite" />
+		</OrchestrationSteps>
+		<ClientDefinition ReferenceId="DefaultWeb" />
+		</UserJourney>
+	</UserJourneys>
+
+	<RelyingParty>
+		<DefaultUserJourney ReferenceId="GenerateInviteToken" />
+		<UserJourneyBehaviors>
+			<JourneyInsights TelemetryEngine="ApplicationInsights" InstrumentationKey="{{B2C_APPINSIGHTS_INSTRUMENTATIONKEY}}" DeveloperMode="{{B2C_APPINSIGHTS_DEVELOPERMODE}}" ClientEnabled="false" ServerEnabled="true" TelemetryVersion="1.0.0" />
+		</UserJourneyBehaviors>
+		<TechnicalProfile Id="PolicyProfile">
+			<DisplayName>PolicyProfile</DisplayName>
+			<Protocol Name="OpenIdConnect" />
+			<OutputClaims>
+				<OutputClaim ClaimTypeReferenceId="email" DefaultValue="" />
+				<OutputClaim ClaimTypeReferenceId="sub" DefaultValue="" />
+			</OutputClaims>
+			<SubjectNamingInfo ClaimType="sub" />
+		</TechnicalProfile>
+	</RelyingParty>
 
 </TrustFrameworkPolicy>

@@ -39,12 +39,12 @@
 
 	<UsingTask TaskName="OE.Build.ReplaceSecretsTask" AssemblyFile="..\..\..\build\OE.Build\bin\Debug\netstandard2.0\OE.Build.dll" />
 
-	<Target Name="PreBuild" BeforeTargets="CoreCompile">
+	<!--<Target Name="PreBuild" BeforeTargets="CoreCompile">
 		<ReplaceSecretsTask Files="@(Compile)" TargetFileName="Constants.cs" Placeholders="B2C_TENANTID,B2C_HOSTNAME,B2C_CLIENTID,B2C_SU_POLICY,B2C_SI_POLICY,XAM_MOBILE_APPID,XAM_ANDROID_SIGHASH" />
 		<ItemGroup>
 			<Compile Remove="Constants.cs" />
 		</ItemGroup>
-	</Target>
+	</Target>-->
 
 	<Target Name="PostBuild" AfterTargets="CoreCompile">
 		<ItemGroup>
