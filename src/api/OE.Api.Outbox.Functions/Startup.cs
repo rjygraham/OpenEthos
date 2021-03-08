@@ -1,4 +1,5 @@
-﻿using Azure.Cosmos;
+﻿using Azure.Identity;
+using Microsoft.Azure.Cosmos;
 using Microsoft.Azure.Functions.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
@@ -17,7 +18,7 @@ namespace OE.Api.Outbox
 			// Set the default Newtonsoft settings to user the custom ActivityStreamsSerializationBinder 
 			JsonConvert.DefaultSettings = () => Extensions.Constants.Serialization.JsonSerializerSettings;
 
-			builder.Services.AddSingleton(new CosmosClient(Environment.GetEnvironmentVariable("CosmosDbSqlConnection"), Constants.CosmosDb.ClientOptions));
+			builder.Services.AddSingleton(new CosmosClient(Environment.GetEnvironmentVariable("CosmosDbSqlAccountEndpoint"), new DefaultAzureCredential(), Constants.CosmosDb.ClientOptions));
 			builder.Services.AddSingleton<IOutboxStore, CosmosDbOutboxStore>();
 			builder.Services.AddSingleton<IInvitationStore, CosmosDbInvitationStore>();
 		}

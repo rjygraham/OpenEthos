@@ -1,10 +1,10 @@
-﻿using Azure.Cosmos;
+﻿using Azure.Identity;
+using Microsoft.Azure.Cosmos;
 using Microsoft.Azure.Functions.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
 using OE.Api.Data;
-using OE.Api.Extensions;
 using OE.Api.Identity;
 using OE.Api.MicrosoftGraph;
 using System;
@@ -28,7 +28,7 @@ namespace OE.Api.Identity
 				Environment.GetEnvironmentVariable("O365GraphEmailSenderObjectId")
 			));
 
-			builder.Services.AddSingleton(new CosmosClient(Environment.GetEnvironmentVariable("CosmosDbSqlConnection"), Data.Constants.CosmosDb.ClientOptions));
+			builder.Services.AddSingleton(new CosmosClient(Environment.GetEnvironmentVariable("CosmosDbSqlAccountEndpoint"), new DefaultAzureCredential(), Data.Constants.CosmosDb.ClientOptions));
 			builder.Services.AddSingleton<IInvitationStore, CosmosDbInvitationStore>();
 		}
 

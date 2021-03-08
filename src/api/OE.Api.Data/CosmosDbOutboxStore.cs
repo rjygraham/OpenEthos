@@ -1,4 +1,4 @@
-﻿using Azure.Cosmos;
+﻿using Microsoft.Azure.Cosmos;
 using OE.Api.Data.Entities;
 using System.Net;
 using System.Threading.Tasks;
@@ -7,7 +7,7 @@ namespace OE.Api.Data
 {
 	public class CosmosDbOutboxStore : IOutboxStore
 	{
-		private readonly CosmosContainer outbox;
+		private readonly Container outbox;
 
 		public CosmosDbOutboxStore(CosmosClient cosmosClient)
 		{
@@ -18,7 +18,7 @@ namespace OE.Api.Data
 		{
 			var partitionKey = new PartitionKey(item.UserId);
 			var result = await outbox.CreateItemAsync(item, partitionKey);
-			return result.GetRawResponse().Status == (int)HttpStatusCode.Created;
+			return result.StatusCode == HttpStatusCode.Created;
 		}
 	}
 }

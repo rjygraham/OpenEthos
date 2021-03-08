@@ -1,4 +1,4 @@
-﻿using Azure.Cosmos;
+﻿using Microsoft.Azure.Cosmos;
 using Newtonsoft.Json;
 using OE.Api.Data.Serialization;
 using OE.Models.ActivityStreams;

@@ -6,6 +6,7 @@
 		"InvitationTokenSigningCertificateThumbprint": "0D204E32A6DBC91BE41012A2756051C14053A4AB",
 		"InvitationTokenIssuer": "https://twitchoedev.b2clogin.com/b623b5db-c160-410c-ab98-5c8bb4d0a06c/v2.0/",
 		"InvitationTokenClientId": "cd431ff9-fd68-466a-af74-f0709b28f13a",
+		"CosmosDbSqlEndpointUri": "https://twitch-openethos-dev-cosmos.documents.azure.com:443/",
 		"CosmosDbSqlConnection": "AccountEndpoint=https://twitch-openethos-dev-cosmos.documents.azure.com:443/;AccountKey=EHIIrTm7kspsQuWdOAGoAoWys65SiZvvTxtop9A0gXGPXdPfuJ6e4E8xc60tEIMPdlddo8sm5I7xKIWYsSbiQg==;",
 		"O365GraphTenantId": "820939ec-94b4-4615-9d55-d42a131949a1",
 		"O365GraphClientId": "5e9725ec-1637-4eed-b9c8-86d7b3292f5c",

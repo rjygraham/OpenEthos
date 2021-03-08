@@ -1,14 +1,14 @@
-﻿using Azure.Cosmos;
-using OE.Api.Data.Entities;
+﻿using OE.Api.Data.Entities;
 using System;
 using System.Net;
 using System.Threading.Tasks;
+using Microsoft.Azure.Cosmos;
 
 namespace OE.Api.Data
 {
 	public class CosmosDbInvitationStore : IInvitationStore
 	{
-		private readonly CosmosContainer invitations;
+		private readonly Container invitations;
 
 		public CosmosDbInvitationStore(CosmosClient cosmosClient)
 		{
@@ -19,7 +19,7 @@ namespace OE.Api.Data
 		{
 			var partitionKey = new PartitionKey(item.EmailAddress);
 			var result = await invitations.CreateItemAsync(item, partitionKey);
-			return result.GetRawResponse().Status == (int)HttpStatusCode.Created;
+			return result.StatusCode == HttpStatusCode.Created;
 		}
 
 		public async Task<InvitationEntity> GetInvitationEntityAsync(string id)
@@ -28,9 +28,9 @@ namespace OE.Api.Data
 			{
 				var partitionKey = new PartitionKey(id);
 				ItemResponse<InvitationEntity> invitation = await invitations.ReadItemAsync<InvitationEntity>(id, partitionKey);
-				return invitation.Value;
+				return invitation.Resource;
 			}
-			catch (CosmosException ex) when (ex.Status == (int)HttpStatusCode.NotFound)
+			catch (CosmosException ex) when (ex.StatusCode == HttpStatusCode.NotFound)
 			{
 				return null;
 			}
@@ -53,7 +53,7 @@ namespace OE.Api.Data
 
 			var partitionKey = new PartitionKey(existing.EmailAddress);
 			var result = await invitations.ReplaceItemAsync(existing, existing.EmailAddress, partitionKey);
-			return result.GetRawResponse().Status == (int)HttpStatusCode.OK;
+			return result.StatusCode == HttpStatusCode.OK;
 		}
 	}
 }

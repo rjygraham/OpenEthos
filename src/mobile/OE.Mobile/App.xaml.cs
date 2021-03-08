@@ -4,7 +4,6 @@ using OE.Mobile.Views;
 using Prism;
 using Prism.Ioc;
 using Prism.Navigation;
-using Refit;
 using System;
 
 namespace OE.Mobile
@@ -28,18 +27,14 @@ namespace OE.Mobile
 			await NavigationService.NavigateAsync(nameof(MainPage));
 		}
 
-		protected override void OnResume()
-		{
-			base.OnResume();
-		}
-
 		protected override void RegisterTypes(IContainerRegistry containerRegistry)
 		{
 			containerRegistry.RegisterForNavigation<MainPage, MainPageViewModel>();
 			containerRegistry.RegisterForNavigation<SignUpPage, SignUpPageViewModel>();
+			containerRegistry.RegisterForNavigation<InvitePage, InvitePageViewModel>();
 
 			containerRegistry.RegisterSingleton<IAuthenticationService, MsalAuthenticationService>();
-			containerRegistry.RegisterInstance<IProfileApiService>(RestService.For<IProfileApiService>("https://twitch-openethos-dev-apim.azure-api.net"));
+			containerRegistry.RegisterSingleton<IApiService, ApiService>();
 		}
 
 		protected override void OnAppLinkRequestReceived(Uri uri)

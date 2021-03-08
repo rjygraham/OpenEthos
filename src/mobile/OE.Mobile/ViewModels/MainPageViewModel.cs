@@ -50,13 +50,12 @@ namespace OE.Mobile.ViewModels
 
 		private async Task ExecuteLoginCommand()
 		{
-			var success = await authenticationService.SignUpAsync("eyJhbGciOiJSUzI1NiIsImtpZCI6IjBEMjA0RTMyQTZEQkM5MUJFNDEwMTJBMjc1NjA1MUMxNDA1M0E0QUIiLCJ4NXQiOiJEU0JPTXFiYnlSdmtFQktpZFdCUndVQlRwS3MiLCJ0eXAiOiJKV1QifQ.eyJlbWFpbCI6InJqeWdyYWhhbUBsaXZlLmNvbSIsInNwb25zb3IiOiIxZTM4MWFjYi05ZTIyLTRmYjMtOGE5OC1jMjQ0ZTU2MDliNWUiLCJuYmYiOjE2MTQxNDQwMDcsImV4cCI6MTYxNDMxNjgwNywiaXNzIjoiaHR0cHM6Ly90d2l0Y2hvZWRldi5iMmNsb2dpbi5jb20vYjYyM2I1ZGItYzE2MC00MTBjLWFiOTgtNWM4YmI0ZDBhMDZjL3YyLjAvIiwiYXVkIjoiY2Q0MzFmZjktZmQ2OC00NjZhLWFmNzQtZjA3MDliMjhmMTNhIn0.r1RPDebL2uS2bAIWKErjtcku1vd_EFS3afGbF8i7-H3J2wekkkODwWfM3Z9xAgWQU-QBO3rhzkYsgLNRrFpN2D3qPZfRZV_F5e9dQSVvUujsfXsjlrw8ihDCK_i1jkRR-OfPe-y1nbuTV9HHCruooLqjiGenCr5Ff0zGU9GeNJbupRzrjVVerWbAx1jiGJXjUi_Kwr-pwe2OODX6CzIde5z16vCY4OfL7qtCB63PYkEDYpHdhZpJfKZvfNtHuab0K5FRVQmnouMSlJvauL0YWMUHayWRh_q99IhxyWXnuAaUEhjZEnagbekvh4Pcq3XBsrqmVsYtW0P1gJvXCu0FEQ", "live.com");
-			//var success = await authenticationService.LoginAsync();
+			var success = await authenticationService.LoginAsync();
 			if (success)
 			{
 				Device.BeginInvokeOnMainThread(() =>
 				{
-					IsAuthenticated = !string.IsNullOrEmpty(authenticationService.AccessToken);
+					// Do something here.
 				});
 			}
 		}
@@ -69,7 +68,7 @@ namespace OE.Mobile.ViewModels
 			{
 				Device.BeginInvokeOnMainThread(() =>
 				{
-					IsAuthenticated = !string.IsNullOrEmpty(authenticationService.AccessToken);
+					// Do something here.
 				});
 			}
 		}
@@ -77,12 +76,12 @@ namespace OE.Mobile.ViewModels
 		public AsyncCommand InvokeApiCommand { get; private set; }
 		private async Task ExecuteInvokeApiCommand()
 		{
-			var profileResponse = await profileApiService.GetProfile("69b918ec-69bb-489c-be71-2900e6a8cbe7").ConfigureAwait(false);
+			var profileResponse = await profileApiService.GetProfileAsync("69b918ec-69bb-489c-be71-2900e6a8cbe7").ConfigureAwait(false);
 
 			Device.BeginInvokeOnMainThread(() =>
 			{
 				Username = profileResponse.Username;
-				DisplayName = profileResponse.DisplayName;
+				DisplayName = profileResponse.Name["en"];
 			});
 		}
 	}

@@ -29,7 +29,7 @@ namespace OE.Mobile.ViewModels
 			{
 				Device.BeginInvokeOnMainThread(() =>
 				{
-					var isAuthenticated = !string.IsNullOrEmpty(authenticationService.AccessToken);
+					// Do something here.
 				});
 			}
 		}

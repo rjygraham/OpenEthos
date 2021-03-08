@@ -3,7 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Xamarin.Forms;
 
@@ -12,8 +11,7 @@ namespace OE.Mobile.Services
 	public class MsalAuthenticationService : IAuthenticationService
 	{
 		private readonly Lazy<IPublicClientApplication> publicClientApplication;
-
-		public string AccessToken { get; private set; }
+		private string accessToken;
 
 		public MsalAuthenticationService(IParentWindowLocatorService parentWindowLocatorService)
 		{
@@ -46,19 +44,19 @@ namespace OE.Mobile.Services
 			try
 			{
 				// acquire token silent
-				AccessToken = await AcquireTokenSilentAsync();
+				accessToken = await AcquireTokenSilentAsync();
 			}
 			catch (MsalUiRequiredException)
 			{
 				// acquire token interactive
-				AccessToken = await SignInInteractivelyAsync(string.Empty);
+				accessToken = await SignInInteractivelyAsync(string.Empty);
 			}
 			catch (Exception ex)
 			{
 				// swallow
 			}
 
-			if (!string.IsNullOrEmpty(AccessToken))
+			if (!string.IsNullOrEmpty(accessToken))
 			{
 				//appStateService.IsLoggedIn = context.IsLoggedIn;
 				//return context.IsLoggedIn;
@@ -82,7 +80,7 @@ namespace OE.Mobile.Services
 					accounts = await publicClientApplication.Value.GetAccountsAsync();
 				}
 
-				AccessToken = string.Empty;
+				accessToken = string.Empty;
 
 				return true;
 			}
@@ -91,6 +89,12 @@ namespace OE.Mobile.Services
 				Debug.WriteLine(ex.ToString());
 				return false;
 			}
+		}
+
+		public async Task<string> GetAccessTokenAsync()
+		{
+			var token = await AcquireTokenSilentAsync().ConfigureAwait(false);
+			return token;
 		}
 
 		private IAccount GetAccountByPolicy(IEnumerable<IAccount> accounts, string policy)
@@ -165,7 +169,7 @@ namespace OE.Mobile.Services
 					})
 					.ExecuteAsync();
 
-				AccessToken = authResult.AccessToken;
+				accessToken = authResult.AccessToken;
 				return true;
 			}
 			catch (MsalClientException mcex)

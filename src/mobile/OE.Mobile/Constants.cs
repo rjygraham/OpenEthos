@@ -1,31 +1,47 @@
-using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Text.RegularExpressions;
+using SourceGenSecrets;
 
 namespace OE.Mobile
 {
-	public static class Constants
+	public static partial class Constants
 	{
-		public static class AuthenticationSettings
+
+		public static partial class ApiSettings
+		{
+			[SourceGenSecret(EnvironmentVariableName = "API_HOST_URL")]
+			public static string HostUrl { get; private set; }
+		}
+
+		public static partial class AuthenticationSettings
 		{
 			// Azure AD B2C Coordinates
-			public const string Tenant = "$B2C_TENANTID$";
-			public const string AzureADB2CHostname = "$B2C_HOSTNAME$";
-			public const string ClientId = "$B2C_CLIENTID$";
-			public const string PolicySignUp = "$B2C_SU_POLICY$";
-			public const string PolicySignIn = "$B2C_SI_POLICY$";
+			[SourceGenSecret(EnvironmentVariableName = "B2C_TENANTID")]
+			public static string Tenant { get; private set; }
 
-			public static string[] Scopes = { "openid", "profile", "offline_access", $"https://{Tenant}/api/profile" };
+			[SourceGenSecret(EnvironmentVariableName = "B2C_HOSTNAME")]
+			public static string AzureADB2CHostname { get; private set; }
 
-			public static string AuthorityBase = $"https://{AzureADB2CHostname}/tfp/{Tenant}/";
-			public static string AuthoritySignUp = $"{AuthorityBase}{PolicySignUp}";
-			public static string AuthoritySignIn = $"{AuthorityBase}{PolicySignIn}";
+			[SourceGenSecret(EnvironmentVariableName = "B2C_CLIENTID")]
+			public static string ClientId { get; private set; }
 
-			public static string AppId = "$XAM_MOBILE_APPID$";
+			[SourceGenSecret(EnvironmentVariableName = "B2C_SU_POLICY")]
+			public static string PolicySignUp { get; private set; }
 
-			public static string AndroidRedirect = $"msauth://{AppId}/$XAM_ANDROID_SIGHASH$";
-			public static string IosRedirect = $"msauth.{AppId}://auth";
+			[SourceGenSecret(EnvironmentVariableName = "B2C_SI_POLICY")]
+			public static string PolicySignIn { get; private set; }
+
+			[SourceGenSecret(EnvironmentVariableName = "XAM_MOBILE_APPID")]
+			public static string AppId { get; private set; }
+
+			[SourceGenSecret(EnvironmentVariableName = "XAM_ANDROID_SIGHASH")]
+			public static string AndroidSigHash { get; private set; } 
+			
+			public static string[] Scopes { get; private set; } = { "openid", "profile", "offline_access", $"https://{Tenant}/api/profile" };
+
+			public static string AuthorityBase { get; private set; } = $"https://{AzureADB2CHostname}/tfp/{Tenant}/";
+			public static string AuthoritySignUp { get; private set; } = $"{AuthorityBase}{PolicySignUp}";
+			public static string AuthoritySignIn { get; private set; } = $"{AuthorityBase}{PolicySignIn}";
+			public static string AndroidRedirect { get; private set; } = $"msauth://{AppId}/{AndroidSigHash}";
+			public static string IosRedirect { get; private set; } = $"msauth.{AppId}://auth";
 		}
 	}
 }
