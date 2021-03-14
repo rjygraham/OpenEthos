@@ -79,6 +79,8 @@ Get-Content $TrustFrameworkBaseSourcePath -Raw
 	| ForEach-Object { $_.replace("{{$B2C_EXTENSIONAPP_OBJECTID}}", $B2C_EXTENSIONAPP_OBJECTID_VALUE) }
 	| Out-File $TrustFrameworkBaseToDeployPath
 
+Write-Host "Policy file" $TrustFrameworkBaseToDeployPath "created successfully."
+
 # Create TrustFrameworkExtensions deployment file.
 Get-Content $TrustFrameworkExtensionsSourcePath -Raw
 	| ForEach-Object  { $_.replace("{{$B2C_TENANTID}}", $B2C_TENANTID_VALUE) }
@@ -90,6 +92,8 @@ Get-Content $TrustFrameworkExtensionsSourcePath -Raw
 	| ForEach-Object  { $_.replace("{{$B2C_MICROSOFT_CLIENTID}}", $B2C_MICROSOFT_CLIENTID_VALUE) }
 	| ForEach-Object  { $_.replace("{{$B2C_MICROSOFT_CLIENTSECRET}}", $B2C_MICROSOFT_CLIENTSECRET_VALUE) }
 	| Out-File $TrustFrameworkExtensionsToDeployPath
+
+Write-Host "Policy file" $TrustFrameworkExtensionsToDeployPath "created successfully."
 
 # Create SignUpWithInvitation deployment file.
 Get-Content $SignUpWithInvitationSourcePath -Raw
@@ -103,6 +107,8 @@ Get-Content $SignUpWithInvitationSourcePath -Raw
 	| ForEach-Object  { $_.replace("{{$B2C_APPINSIGHTS_INSTRUMENTATIONKEY}}", $B2C_APPINSIGHTS_INSTRUMENTATIONKEY_VALUE) }
 	| ForEach-Object  { $_.replace("{{$B2C_APPINSIGHTS_DEVELOPERMODE}}", $B2C_APPINSIGHTS_DEVELOPERMODE_VALUE) }
 	| Out-File $SignUpWithInvitationDeployPath
+
+Write-Host "Policy file" $SignUpWithInvitationDeployPath "created successfully."
 
 # Create Signin deployment file.
 Get-Content $SignInSourcePath -Raw
@@ -122,6 +128,8 @@ Get-Content $SignInSourcePath -Raw
 	| ForEach-Object  { $_.replace("{{$API_HOST_URL}}", $API_HOST_URL_VALUE) }
 	| Out-File $SignInToDeployPath
 
+Write-Host "Policy file" $SignInToDeployPath "created successfully."
+
 Get-Content $InvitationSourcePath -Raw
 	| ForEach-Object  { $_.replace("{{$B2C_TENANTID}}", $B2C_TENANTID_VALUE) }
 	| ForEach-Object  { $_.replace("{{$B2C_TENANTOBJECTID}}", $B2C_TENANTOBJECTID_VALUE) }
@@ -129,3 +137,5 @@ Get-Content $InvitationSourcePath -Raw
 	| ForEach-Object  { $_.replace("{{$B2C_APPINSIGHTS_INSTRUMENTATIONKEY}}", $B2C_APPINSIGHTS_INSTRUMENTATIONKEY_VALUE) }
 	| ForEach-Object  { $_.replace("{{$B2C_APPINSIGHTS_DEVELOPERMODE}}", $B2C_APPINSIGHTS_DEVELOPERMODE_VALUE) }
 	| Out-File $InvitationDeployPath
+
+Write-Host "Policy file" $InvitationDeployPath "created successfully."

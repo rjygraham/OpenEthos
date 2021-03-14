@@ -12,7 +12,8 @@ jobs:
       name: twitch
     steps:
     - uses: actions/checkout@v2
-    - uses: ./.github/actions/deploy-b2c-env-action
+    - name: 'Prepare and deploy policy files'
+      uses: ./.github/actions/deploy-b2c-env-action
       with:
         B2C_TENANTID: ${{ secrets.B2C_TENANTID }}
         B2C_TENANTOBJECTID: ${{ secrets.B2C_TENANTOBJECTID }}
