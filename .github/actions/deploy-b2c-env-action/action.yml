@@ -46,7 +46,8 @@ runs:
   using: "composite"
   steps: 
     - name: 'Prepare policy files'
-      shell: pwsh
+      shell: 'pwsh'
+      working-directory: 'src/b2c'
       env:
         B2C_TENANTID: ${{ inputs.B2C_TENANTID }}
         B2C_TENANTOBJECTID: ${{ inputs.B2C_TENANTOBJECTID }}
@@ -70,6 +71,7 @@ runs:
       run: |
         .\Invoke-PrepareIEFPolicyFiles.ps1
     - name: 'Deploy policy files'
-      shell: pwsh
+      shell: 'pwsh'
+      working-directory: 'src/b2c'
       run: |
         .\Invoke-DeployIEFPolicyFile.ps1 -TenantId ${{ inputs.B2C_TENANTOBJECTID }} -ClientId ${{ inputs.B2C_DEPLOY_CLIENTID }} -ClientSecret ${{ inputs.B2C_DEPLOY_CLIENTSECRET }}

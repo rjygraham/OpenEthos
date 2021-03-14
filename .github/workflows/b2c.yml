@@ -4,10 +4,6 @@ on: [push]
   #   paths:
   #     - '/src/b2c'
 
-defaults:
-  run:
-    working-directory: src/b2c
-
 jobs:
   twitch:
     if: github.ref == 'refs/heads/twitch'
