@@ -28,7 +28,7 @@ try {
         $FileName = $Policy.Value
 
         $GraphUri = 'https://graph.microsoft.com/beta/trustframework/policies/' + $PolicyId + '/$value'
-        $PolicyContent = Get-Content $FileName
+        $PolicyContent = Get-Content (Join-Path "Deploy" $FileName)
         $Response = Invoke-RestMethod -Uri $GraphUri -Method Put -Body $PolicyContent -Headers $Headers
 
         Write-Host "Policy" $PolicyId "uploaded successfully."

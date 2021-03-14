@@ -40,7 +40,7 @@ jobs:
         B2C_IEF_CLIENTID: ${{ secrets.B2C_IEF_CLIENTID }}
       run: |
         .\Invoke-PrepareIEFPolicyFiles.ps1
-    - name: 'Prepare policy files'
+    - name: 'Deploy policy files'
       shell: pwsh
       run: |
         .\Invoke-DeployIEFPolicyFile.ps1 -TenantId ${{ secrets.B2C_TENANTOBJECTID }} -ClientId ${{ secrets.B2C_DEPLOY_CLIENTID }} -ClientSecret ${{ secrets.B2C_DEPLOY_CLIENTSECRET }}
