@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<TrustFrameworkPolicy
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	xmlns="http://schemas.microsoft.com/online/cpim/schemas/2013/06"
+	PolicySchemaVersion="0.3.0.0"
+	TenantId="{{B2C_TENANTID}}"
+	PolicyId="B2C_1A_SI"
+	PublicPolicyUri="http://{{B2C_TENANTID}}/B2C_1A_SI"
+	DeploymentMode="{{B2C_DEPLOYMENTMODE}}"
+	UserJourneyRecorderEndpoint="urn:journeyrecorder:applicationinsights">
+
+	<BasePolicy>
+		<TenantId>{{B2C_TENANTID}}</TenantId>
+		<PolicyId>B2C_1A_TrustFrameworkExtensions</PolicyId>
+	</BasePolicy>
+
+	 <!-- <BuildingBlocks>
+
+		<ClaimsSchema>
+			
+		</ClaimsSchema>
+
+	</BuildingBlocks> -->
+
+	<!-- <ClaimsProviders>
+
+		<ClaimsProvider>
+			<DisplayName>REST APIs</DisplayName>
+			<TechnicalProfiles>
+				<TechnicalProfile Id="REST-GetInvitation">
+					<DisplayName>Get Invitation</DisplayName>
+					<Protocol Name="Proprietary" Handler="Web.TPEngine.Providers.RestfulProvider, Web.TPEngine, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" />
+					<Metadata>
+						<Item Key="ServiceUrl">{{API_HOST_URL}}/identity/invitations/get</Item>
+						<Item Key="AuthenticationType">None</Item>
+						<Item Key="SendClaimsIn">Body</Item>
+					</Metadata>
+					<InputClaims>
+						<InputClaim ClaimTypeReferenceId="email" />
+					</InputClaims>
+					<OutputClaims>
+						<OutputClaim ClaimTypeReferenceId="extension_ancestorId" PartnerClaimType="ancestor" />
+						<OutputClaim ClaimTypeReferenceId="extension_sponsorId" PartnerClaimType="sponsor" />
+					</OutputClaims>
+					<UseTechnicalProfileForSessionManagement ReferenceId="SM-Noop" />
+				</TechnicalProfile>
+
+			</TechnicalProfiles>
+		</ClaimsProvider>
+
+	</ClaimsProviders> -->
+
+	<!-- <UserJourneys>
+		
+	</UserJourneys> -->
+
+	<!-- <RelyingParty>
+		<DefaultUserJourney ReferenceId="InvitationSignUp" />
+		<UserJourneyBehaviors>
+			<JourneyInsights TelemetryEngine="ApplicationInsights" InstrumentationKey="{{B2C_APPINSIGHTS_INSTRUMENTATIONKEY}}" DeveloperMode="{{B2C_APPINSIGHTS_DEVELOPERMODE}}" ClientEnabled="false" ServerEnabled="true" TelemetryVersion="1.0.0" />
+		</UserJourneyBehaviors>
+		<TechnicalProfile Id="PolicyProfile">
+			<DisplayName>PolicyProfile</DisplayName>
+			<Protocol Name="OpenIdConnect" />
+			<InputClaims>
+				<InputClaim ClaimTypeReferenceId="email" />
+			</InputClaims>
+			<OutputClaims>
+				<OutputClaim ClaimTypeReferenceId="email" />
+				<OutputClaim ClaimTypeReferenceId="extension_ancestorId" PartnerClaimType="ancestor" />
+				<OutputClaim ClaimTypeReferenceId="extension_sponsorId" PartnerClaimType="sponsor" />
+				<OutputClaim ClaimTypeReferenceId="displayName" PartnerClaimType="name" />
+				<OutputClaim ClaimTypeReferenceId="objectId" PartnerClaimType="sub" />
+				<OutputClaim ClaimTypeReferenceId="identityProvider" />
+				<OutputClaim ClaimTypeReferenceId="tenantId" AlwaysUseDefaultValue="true" DefaultValue="{Policy:TenantObjectId}" />
+			</OutputClaims>
+			<SubjectNamingInfo ClaimType="sub" />
+		</TechnicalProfile>
+	</RelyingParty> -->
+
+</TrustFrameworkPolicy>

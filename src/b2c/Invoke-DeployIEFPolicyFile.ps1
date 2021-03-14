@@ -1,38 +1,49 @@
 [Cmdletbinding()]
 Param(
-    [Parameter(Mandatory = $true)][string]$ClientID,
-    [Parameter(Mandatory = $true)][string]$ClientSecret,
     [Parameter(Mandatory = $true)][string]$TenantId,
-    [Parameter(Mandatory = $true)][string]$PolicyId,
-    [Parameter(Mandatory = $true)][string]$PathToFile
+    [Parameter(Mandatory = $true)][string]$ClientId,
+    [Parameter(Mandatory = $true)][string]$ClientSecret
 )
 
+$Policies = @{
+    B2C_1A_TrustFrameworkBase = "TrustFrameworkBase.xml";
+    B2C_1A_TrustFrameworkExtensions = "TrustFrameworkExtensions.xml";
+    B2C_1A_Invitation = "Invitation.xml";
+    B2C_1A_SU_Invitation = "SignUpWithInvitation.xml";
+    B2C_1A_SI = "SignIn.xml";
+}
+
 try {
-    $body = @{grant_type = "client_credentials"; scope = "https://graph.microsoft.com/.default"; client_id = $ClientID; client_secret = $ClientSecret }
+    $Body = @{grant_type = "client_credentials"; scope = "https://graph.microsoft.com/.default"; client_id = $ClientId; client_secret = $ClientSecret }
 
-    $response = Invoke-RestMethod -Uri https://login.microsoftonline.com/$TenantId/oauth2/v2.0/token -Method Post -Body $body
-    $token = $response.access_token
+    $Response = Invoke-RestMethod -Uri https://login.microsoftonline.com/$TenantId/oauth2/v2.0/token -Method Post -Body $Body
+    $Token = $Response.access_token
 
-    $headers = New-Object "System.Collections.Generic.Dictionary[[String],[String]]"
-    $headers.Add("Content-Type", 'application/xml')
-    $headers.Add("Authorization", 'Bearer ' + $token)
+    $Headers = New-Object "System.Collections.Generic.Dictionary[[String],[String]]"
+    $Headers.Add("Content-Type", 'application/xml')
+    $Headers.Add("Authorization", 'Bearer ' + $token)
 
-    $graphuri = 'https://graph.microsoft.com/beta/trustframework/policies/' + $PolicyId + '/$value'
-    $policycontent = Get-Content $PathToFile
-    $response = Invoke-RestMethod -Uri $graphuri -Method Put -Body $policycontent -Headers $headers
+    foreach ($Policy in $Policies.GetEnumerator()) {
+        $PolicyId = $Policy.Key
+        $FileName = $Policy.Value
 
-    Write-Host "Policy" $PolicyId "uploaded successfully."
+        $GraphUri = 'https://graph.microsoft.com/beta/trustframework/policies/' + $PolicyId + '/$value'
+        $PolicyContent = Get-Content $FileName
+        $Response = Invoke-RestMethod -Uri $GraphUri -Method Put -Body $PolicyContent -Headers $Headers
+
+        Write-Host "Policy" $PolicyId "uploaded successfully."
+    }
 }
 catch {
     Write-Host "StatusCode:" $_.Exception.Response.StatusCode.value__
 
     $_
 
-    $streamReader = [System.IO.StreamReader]::new($_.Exception.Response.GetResponseStream())
-    $streamReader.BaseStream.Position = 0
-    $streamReader.DiscardBufferedData()
-    $errResp = $streamReader.ReadToEnd()
-    $streamReader.Close()
+    $StreamReader = [System.IO.StreamReader]::new($_.Exception.Response.GetResponseStream())
+    $StreamReader.BaseStream.Position = 0
+    $StreamReader.DiscardBufferedData()
+    $SrrResp = $streamReader.ReadToEnd()
+    $StreamReader.Close()
 
     $ErrResp
 
