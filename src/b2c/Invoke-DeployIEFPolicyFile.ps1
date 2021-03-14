@@ -5,7 +5,7 @@ Param(
     [Parameter(Mandatory = $true)][string]$ClientSecret
 )
 
-$Policies = @{
+$Policies = [ordered]@{
     B2C_1A_TrustFrameworkBase = "TrustFrameworkBase.xml";
     B2C_1A_TrustFrameworkExtensions = "TrustFrameworkExtensions.xml";
     B2C_1A_Invitation = "Invitation.xml";
