@@ -37,7 +37,7 @@ $B2C_EXTENSIONAPP_OBJECTID = "B2C_EXTENSIONAPP_OBJECTID"
 $B2C_EXTENSIONAPP_OBJECTID_VALUE = [System.Environment]::GetEnvironmentVariable($B2C_EXTENSIONAPP_OBJECTID)
 
 $API_HOST_URL = "API_HOST_URL"
-$API_HOST_URL = [System.Environment]::GetEnvironmentVariable($API_HOST_URL)
+$API_HOST_URL_VALUE = [System.Environment]::GetEnvironmentVariable($API_HOST_URL)
 
 $B2C_APPLE_CLIENTID = "B2C_APPLE_CLIENTID"
 $B2C_APPLE_CLIENTID_VALUE = [System.Environment]::GetEnvironmentVariable($B2C_APPLE_CLIENTID)
@@ -119,6 +119,7 @@ Get-Content $SignInSourcePath -Raw
 	| ForEach-Object  { $_.replace("{{$B2C_MICROSOFT_CLIENTSECRET}}", $B2C_MICROSOFT_CLIENTSECRET_VALUE) }
 	| ForEach-Object  { $_.replace("{{$B2C_APPINSIGHTS_INSTRUMENTATIONKEY}}", $B2C_APPINSIGHTS_INSTRUMENTATIONKEY_VALUE) }
 	| ForEach-Object  { $_.replace("{{$B2C_APPINSIGHTS_DEVELOPERMODE}}", $B2C_APPINSIGHTS_DEVELOPERMODE_VALUE) }
+	| ForEach-Object  { $_.replace("{{$API_HOST_URL}}", $API_HOST_URL_VALUE) }
 	| Out-File $SignInToDeployPath
 
 Get-Content $InvitationSourcePath -Raw

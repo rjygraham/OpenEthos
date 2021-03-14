@@ -43,4 +43,4 @@ jobs:
     - uses: actions/upload-artifact@v2
       with: 
         name: prepped-policies
-        path: .
+        path: ./src/b2c/Deploy/
