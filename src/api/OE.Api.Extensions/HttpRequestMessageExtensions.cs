@@ -22,8 +22,14 @@ namespace OE.Api.Extensions
 		}
 
 		public static async Task<T> ToModelAsync<T>(this HttpRequestMessage request)
+			where T: class
 		{
 			var json = await request.Content.ReadAsStringAsync();
+			if (string.IsNullOrWhiteSpace(json))
+			{
+				return null;
+			}
+
 			return JsonConvert.DeserializeObject<T>(json);
 		}
 
@@ -31,7 +37,17 @@ namespace OE.Api.Extensions
 			where T: ActivityStreamsObject
 		{
 			var json = await request.Content.ReadAsStringAsync();
+			if (string.IsNullOrWhiteSpace(json))
+			{
+				return null;
+			}
+
 			var model = JsonConvert.DeserializeObject<T>(json);
+			if (model == null)
+			{
+				return null;
+			}
+
 			model.Id = Guid.NewGuid().ToString();
 			model.Published = DateTimeOffset.UtcNow;
 
@@ -41,6 +57,11 @@ namespace OE.Api.Extensions
 		public static async Task<Activity> ToActivityStreamsActivityModelAsync(this HttpRequestMessage request, string userId)
 		{
 			var model = await request.ToActivityStreamsModelAsync<Activity>();
+			if (model == null)
+			{
+				return null;
+			}
+
 			model.Actor = new HashSet<ActivityStreamsBase>
 			{
 				new Person

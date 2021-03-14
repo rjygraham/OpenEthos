@@ -28,7 +28,7 @@ namespace OE.Api.Identity
 				Environment.GetEnvironmentVariable("O365GraphEmailSenderObjectId")
 			));
 
-			builder.Services.AddSingleton(new CosmosClient(Environment.GetEnvironmentVariable("CosmosDbSqlAccountEndpoint"), new DefaultAzureCredential(), Data.Constants.CosmosDb.ClientOptions));
+			builder.Services.AddSingleton(new CosmosClient(Environment.GetEnvironmentVariable("CosmosDbSqlConnection"), Data.Constants.CosmosDb.ClientOptions));
 			builder.Services.AddSingleton<IInvitationStore, CosmosDbInvitationStore>();
 		}
 

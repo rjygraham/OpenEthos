@@ -53,9 +53,9 @@
 					<Protocol Name="None" />
 					<Metadata>
 						<!--Sample action required: replace with your endpoint location -->
-						<Item Key="METADATA">{{B2C_ID_TOKEN_HINT_METADATA}}</Item>
+						<Item Key="METADATA">https://{{B2C_HOSTNAME}}/{{B2C_TENANTID}}/v2.0/.well-known/openid-configuration?p=B2C_1A_Invitation</Item>
+						<Item Key="issuer">https://{{B2C_HOSTNAME}}/{{B2C_TENANTOBJECTID}}/v2.0/</Item>
 						<Item Key="IdTokenAudience">{{B2C_ID_TOKEN_HINT_AUDIENCE}}</Item>
-						<Item Key="issuer">{{B2C_ID_TOKEN_HINT_ISSUER}}</Item>
 					</Metadata>
 					<CryptographicKeys>
 						<Key Id="client_secret" StorageReferenceId="{{B2C_ID_TOKEN_HINT_CERT}}" />
@@ -75,7 +75,7 @@
 					<DisplayName>Get Invitation</DisplayName>
 					<Protocol Name="Proprietary" Handler="Web.TPEngine.Providers.RestfulProvider, Web.TPEngine, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" />
 					<Metadata>
-						<Item Key="ServiceUrl">https://5fc1b386dfd2.ngrok.io/api/invitations/get</Item>
+						<Item Key="ServiceUrl">{{API_HOST_URL}}/identity/invitations/get</Item>
 						<Item Key="AuthenticationType">None</Item>
 						<Item Key="SendClaimsIn">Body</Item>
 					</Metadata>
@@ -93,7 +93,7 @@
 					<DisplayName>Get Invitation</DisplayName>
 					<Protocol Name="Proprietary" Handler="Web.TPEngine.Providers.RestfulProvider, Web.TPEngine, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" />
 					<Metadata>
-						<Item Key="ServiceUrl">https://5fc1b386dfd2.ngrok.io/api/invitations/redeem</Item>
+						<Item Key="ServiceUrl">{{API_HOST_URL}}/identity/invitations/redeem</Item>
 						<Item Key="AuthenticationType">None</Item>
 						<Item Key="SendClaimsIn">Body</Item>
 					</Metadata>
