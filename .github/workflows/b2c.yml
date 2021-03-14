@@ -16,7 +16,7 @@ jobs:
       name: twitch
     steps:
     - uses: actions/checkout@v2
-    - uses: rjygraham/OpenEthos/actions/deploy-b2c-env-action
+    - uses: rjygraham/OpenEthos/actions/deploy-b2c-env-action@HEAD
       # with:
       #   B2C_TENANTID: ${{ secrets.B2C_TENANTID }}
       #   B2C_TENANTOBJECTID: ${{ secrets.B2C_TENANTOBJECTID }}
