@@ -15,6 +15,7 @@ jobs:
     environment:
       name: twitch
     steps:
+    - uses: actions/checkout@v2
     - uses: actions/deploy-b2c-env-action@v1
       # with:
       #   B2C_TENANTID: ${{ secrets.B2C_TENANTID }}

@@ -45,7 +45,6 @@ name: 'Deploy B2C Policy Files'
 runs:
   using: "composite"
   steps: 
-    - uses: actions/checkout@v2
     - name: 'Prepare policy files'
       shell: pwsh
       env:
