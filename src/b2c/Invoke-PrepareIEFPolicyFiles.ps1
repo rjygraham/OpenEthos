@@ -13,8 +13,8 @@ $TrustFrameworkExtensionsToDeployPath = Join-Path $DeployPath "TrustFrameworkExt
 $SignUpWithInvitationSourcePath = Join-Path $SuSiPath "SignUpWithInvitation.xml"
 $SignUpWithInvitationDeployPath = Join-Path $DeployPath "SignUpWithInvitation.xml"
 
-$SignInSourcePath = Join-Path $SuSiPath "Signin.xml"
-$SignInToDeployPath = Join-Path $DeployPath "Signin.xml"
+$SignInSourcePath = Join-Path $SuSiPath "SignIn.xml"
+$SignInToDeployPath = Join-Path $DeployPath "SignIn.xml"
 
 $InvitationSourcePath = Join-Path $InvitationPath "Invitation.xml"
 $InvitationDeployPath = Join-Path $DeployPath "Invitation.xml"
