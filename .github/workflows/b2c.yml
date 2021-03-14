@@ -2,7 +2,7 @@ name: deploy-b2c-ief-policies
 on:
   push:
     paths:
-      - 'src/b2c'
+      - '/src/b2c'
 
 defaults:
   run:
