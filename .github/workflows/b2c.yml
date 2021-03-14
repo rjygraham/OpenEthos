@@ -9,38 +9,30 @@ defaults:
     working-directory: src/b2c
 
 jobs:
-  deploytwitch:
+  twitch:
     if: github.ref == 'refs/heads/twitch'
     runs-on: ubuntu-latest
     environment:
       name: twitch
     steps:
-    - uses: actions/checkout@v2
-    - name: 'Prepare policy files'
-      shell: pwsh
-      env:
-        B2C_TENANTID: ${{ secrets.B2C_TENANTID }}
-        B2C_TENANTOBJECTID: ${{ secrets.B2C_TENANTOBJECTID }}
-        B2C_HOSTNAME: ${{ secrets.B2C_HOSTNAME }}
-        B2C_DEPLOYMENTMODE: ${{ secrets.B2C_DEPLOYMENTMODE }}
-        B2C_EXTENSIONAPP_CLIENTID: ${{ secrets.B2C_EXTENSIONAPP_CLIENTID }}
-        B2C_EXTENSIONAPP_OBJECTID: ${{ secrets.B2C_EXTENSIONAPP_OBJECTID }}
-        API_HOST_URL: ${{ secrets.API_HOST_URL }}
-        B2C_APPLE_CLIENTID: ${{ secrets.B2C_APPLE_CLIENTID }}
-        B2C_APPLE_CLIENTSECRET: ${{ secrets.B2C_APPLE_CLIENTSECRET }}
-        B2C_GOOGLE_CLIENTID: ${{ secrets.B2C_GOOGLE_CLIENTID }}
-        B2C_GOOGLE_CLIENTSECRET: ${{ secrets.B2C_GOOGLE_CLIENTSECRET }}
-        B2C_MICROSOFT_CLIENTID: ${{ secrets.B2C_MICROSOFT_CLIENTID }}
-        B2C_MICROSOFT_CLIENTSECRET: ${{ secrets.B2C_MICROSOFT_CLIENTSECRET }}
-        B2C_APPINSIGHTS_INSTRUMENTATIONKEY: ${{ secrets.B2C_APPINSIGHTS_INSTRUMENTATIONKEY }}
-        B2C_APPINSIGHTS_DEVELOPERMODE: ${{ secrets.B2C_APPINSIGHTS_DEVELOPERMODE }}
-        B2C_ID_TOKEN_HINT_AUDIENCE: ${{ secrets.B2C_ID_TOKEN_HINT_AUDIENCE }}
-        B2C_ID_TOKEN_HINT_CERT: ${{ secrets.B2C_ID_TOKEN_HINT_CERT }}
-        B2C_PROXY_IEF_CLIENTID: ${{ secrets.B2C_PROXY_IEF_CLIENTID }}
-        B2C_IEF_CLIENTID: ${{ secrets.B2C_IEF_CLIENTID }}
-      run: |
-        .\Invoke-PrepareIEFPolicyFiles.ps1
-    - name: 'Deploy policy files'
-      shell: pwsh
-      run: |
-        .\Invoke-DeployIEFPolicyFile.ps1 -TenantId ${{ secrets.B2C_TENANTOBJECTID }} -ClientId ${{ secrets.B2C_DEPLOY_CLIENTID }} -ClientSecret ${{ secrets.B2C_DEPLOY_CLIENTSECRET }}
+    - uses: actions/deploy-b2c-env-action@v1
+      # with:
+      #   B2C_TENANTID: ${{ secrets.B2C_TENANTID }}
+      #   B2C_TENANTOBJECTID: ${{ secrets.B2C_TENANTOBJECTID }}
+      #   B2C_HOSTNAME: ${{ secrets.B2C_HOSTNAME }}
+      #   B2C_DEPLOYMENTMODE: ${{ secrets.B2C_DEPLOYMENTMODE }}
+      #   B2C_EXTENSIONAPP_CLIENTID: ${{ secrets.B2C_EXTENSIONAPP_CLIENTID }}
+      #   B2C_EXTENSIONAPP_OBJECTID: ${{ secrets.B2C_EXTENSIONAPP_OBJECTID }}
+      #   API_HOST_URL: ${{ secrets.API_HOST_URL }}
+      #   B2C_APPLE_CLIENTID: ${{ secrets.B2C_APPLE_CLIENTID }}
+      #   B2C_APPLE_CLIENTSECRET: ${{ secrets.B2C_APPLE_CLIENTSECRET }}
+      #   B2C_GOOGLE_CLIENTID: ${{ secrets.B2C_GOOGLE_CLIENTID }}
+      #   B2C_GOOGLE_CLIENTSECRET: ${{ secrets.B2C_GOOGLE_CLIENTSECRET }}
+      #   B2C_MICROSOFT_CLIENTID: ${{ secrets.B2C_MICROSOFT_CLIENTID }}
+      #   B2C_MICROSOFT_CLIENTSECRET: ${{ secrets.B2C_MICROSOFT_CLIENTSECRET }}
+      #   B2C_APPINSIGHTS_INSTRUMENTATIONKEY: ${{ secrets.B2C_APPINSIGHTS_INSTRUMENTATIONKEY }}
+      #   B2C_APPINSIGHTS_DEVELOPERMODE: ${{ secrets.B2C_APPINSIGHTS_DEVELOPERMODE }}
+      #   B2C_ID_TOKEN_HINT_AUDIENCE: ${{ secrets.B2C_ID_TOKEN_HINT_AUDIENCE }}
+      #   B2C_ID_TOKEN_HINT_CERT: ${{ secrets.B2C_ID_TOKEN_HINT_CERT }}
+      #   B2C_PROXY_IEF_CLIENTID: ${{ secrets.B2C_PROXY_IEF_CLIENTID }}
+      #   B2C_IEF_CLIENTID: ${{ secrets.B2C_IEF_CLIENTID }}
