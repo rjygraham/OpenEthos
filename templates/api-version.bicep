@@ -1,16 +1,19 @@
 targetScope = 'resourceGroup'
 
 param location string
-param name string
+param environmentRegionName string
 param apimName string
+param apimPricipalId string
+param apiDisplayName string
 param apiName string
 param version string
 param serverFarmResourceId string
-param storageAccountConnectionString string {
-  secure: true
-}
+param storageAccountConnectionString string
+param appInsightsInstrumentationKey string
+param apiOpenIdIssuer string
+param apiOpenIdClientId string
 
-var functionAppName = '${name}-${apimName}-${version}-func'
+var functionAppName = '${environmentRegionName}-${apiName}-${version}-func'
 
 resource func 'Microsoft.Web/sites@2020-06-01' = {
 	name: functionAppName
@@ -20,8 +23,17 @@ resource func 'Microsoft.Web/sites@2020-06-01' = {
 		type: 'SystemAssigned'
 	}
 	properties: {
+		httpsOnly: true
 		siteConfig: {
 			appSettings: [
+				{
+					name: 'APPINSIGHTS_INSTRUMENTATIONKEY'
+					value: appInsightsInstrumentationKey
+				}
+				{
+					name: 'APPLICATIONINSIGHTS_CONNECTION_STRING'
+					value: 'InstrumentationKey=${appInsightsInstrumentationKey};'
+				}
 				{
 					name: 'FUNCTIONS_WORKER_RUNTIME'
 					value: 'dotnet-isolated'
@@ -35,8 +47,50 @@ resource func 'Microsoft.Web/sites@2020-06-01' = {
 					value: storageAccountConnectionString
 				}
 			]
+			netFrameworkVersion: 'v5.0'
+			http20Enabled: true
+			minTlsVersion: '1.2'
+			scmMinTlsVersion: '1.2'
+			ftpsState: 'Disabled'
 		}
 		serverFarmId: serverFarmResourceId
+	}
+}
+
+resource auth 'Microsoft.Web/sites/config@2020-06-01' = {
+	name: '${func.name}/authsettingsV2'
+	properties: {
+		platform: {
+			enabled: true
+			runtimeVersion: '~1'
+		}
+		globalValidation: {
+			requireAuthentication: true
+			unauthenticatedClientAction: 'Return403'
+			redirectToProvider: 'azureactivedirectory'
+		}
+		identityProviders: {
+			azureActiveDirectory: {
+				enabled: true
+				registration: {
+					openIdIssuer: apiOpenIdIssuer
+					clientId: apiOpenIdClientId
+				}
+				login: {
+					disableWWWAuthenticate: true
+				}
+				validation: {
+					jwtClaimChecks: {}
+					allowedAudiences: [
+						apiOpenIdClientId
+					]
+					allowedClientApplications: [
+						apimPricipalId
+					]
+				}
+				isAutoProvisioned: true
+			}
+		}
 	}
 }
 
@@ -46,10 +100,11 @@ resource api 'Microsoft.ApiManagement/service/apis@2020-06-01-preview' = {
 		apiType: 'http'
 		apiVersion: version
 		apiVersionSetId: '/apiVersionSets/${apiName}'
-		path: 'identity'
-		displayName: version
+		path: apiName
+		displayName: apiDisplayName
 		protocols: [
 			'https'
 		]
+		serviceUrl: 'https://${func.properties.hostNames[0]}'
 	}
 }

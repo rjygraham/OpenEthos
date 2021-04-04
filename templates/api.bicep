@@ -1,17 +1,21 @@
 targetScope = 'resourceGroup'
 
 param location string
-param name string
+param environmentRegionName string
 param apimName string
+param apimPricipalId string
 param apiDisplayName string
 param apiName string
 param apiVersions array
 param serverFarmResourceId string
-param storageAccountConnectionString string {
-  secure: true
-}
+param appInsightsInstrumentationKey string
+param apiOpenIdIssuer string
+param apiOpenIdClientId string
 
-resource identityApiVersionSet 'Microsoft.ApiManagement/service/api-version-sets@2018-06-01-preview' = {
+@secure()
+param storageAccountConnectionString string
+
+resource apiVersionSet 'Microsoft.ApiManagement/service/api-version-sets@2018-06-01-preview' = {
 	name: '${apimName}/${apiName}'
 	properties: {
 		displayName: '${apiDisplayName}'
@@ -22,13 +26,21 @@ resource identityApiVersionSet 'Microsoft.ApiManagement/service/api-version-sets
 
 module apiVersion 'api-version.bicep' = [for version in apiVersions: {
   name: '${apiName}.api.${version}'
+  dependsOn: [
+    apiVersionSet
+  ]
   params: {
     location: location
-    name: name
+    environmentRegionName: environmentRegionName
     apimName: apimName
+    apimPricipalId: apimPricipalId
+	  apiDisplayName: apiDisplayName
     apiName: apiName
     version: version
     serverFarmResourceId: serverFarmResourceId
     storageAccountConnectionString: storageAccountConnectionString
+    appInsightsInstrumentationKey: appInsightsInstrumentationKey
+    apiOpenIdIssuer: apiOpenIdIssuer
+		apiOpenIdClientId: apiOpenIdClientId
   }
 }]
