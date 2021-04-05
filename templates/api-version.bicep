@@ -46,6 +46,18 @@ resource func 'Microsoft.Web/sites@2020-06-01' = {
 					name: 'AzureWebJobsStorage'
 					value: storageAccountConnectionString
 				}
+				{
+					name: 'WEBSITE_MOUNT_ENABLED'
+					value: '1'
+				}
+				{
+					name: 'WEBSITE_RUN_FROM_PACKAGE'
+					value: '1'
+				}
+				{
+					name: 'NOOP_AUTHENTICATION_SECRET'
+					value: ''
+				}
 			]
 			netFrameworkVersion: 'v5.0'
 			http20Enabled: true
@@ -55,40 +67,63 @@ resource func 'Microsoft.Web/sites@2020-06-01' = {
 		}
 		serverFarmId: serverFarmResourceId
 	}
+
+	resource auth 'config' = {
+		name: 'authsettingsV2'
+		properties: {
+			platform: {
+				enabled: true
+			}
+			globalValidation: {
+				requireAuthentication: true
+				unauthenticatedClientAction: 'Return403'
+				redirectToProvider: 'azureactivedirectory'
+			}
+			identityProviders: {
+				azureActiveDirectory: {
+					enabled: true
+					registration: {
+						openIdIssuer: apiOpenIdIssuer
+						clientId: apiOpenIdClientId
+						clientSecretSettingName: 'NOOP_AUTHENTICATION_SECRET'
+					}
+					login: {
+						disableWWWAuthenticate: false
+					}
+					validation: {
+						jwtClaimChecks: {}
+						allowedAudiences: [
+							apiOpenIdClientId
+						]
+						allowedClientApplications: [
+							apimPricipalId
+						]
+					}
+					isAutoProvisioned: true
+				}
+			}
+		}
+	}
 }
 
-resource auth 'Microsoft.Web/sites/config@2020-06-01' = {
-	name: '${func.name}/authsettingsV2'
+resource hostKey 'Microsoft.Web/sites/host/functionkeys@2020-06-01' = {
+	name: '${func.name}/default/apim'
 	properties: {
-		platform: {
-			enabled: true
-			runtimeVersion: '~1'
-		}
-		globalValidation: {
-			requireAuthentication: true
-			unauthenticatedClientAction: 'Return403'
-			redirectToProvider: 'azureactivedirectory'
-		}
-		identityProviders: {
-			azureActiveDirectory: {
-				enabled: true
-				registration: {
-					openIdIssuer: apiOpenIdIssuer
-					clientId: apiOpenIdClientId
-				}
-				login: {
-					disableWWWAuthenticate: true
-				}
-				validation: {
-					jwtClaimChecks: {}
-					allowedAudiences: [
-						apiOpenIdClientId
-					]
-					allowedClientApplications: [
-						apimPricipalId
-					]
-				}
-				isAutoProvisioned: true
+		name: 'apim'
+	}
+}
+
+resource apimBackend 'Microsoft.ApiManagement/service/backends@2020-06-01-preview' = {
+	name: '${apimName}/${apiName}-${version}'
+	properties: {
+		protocol: 'http'
+		url: 'https://${func.properties.hostNames[0]}/api'
+		resourceId: 'https://management.azure.com${func.id}'
+		credentials: {
+			header: {
+				'x-functions-key': [
+					listkeys('${func.id}/host/default/', '2020-06-01').functionKeys.apim
+				]
 			}
 		}
 	}
@@ -105,6 +140,15 @@ resource api 'Microsoft.ApiManagement/service/apis@2020-06-01-preview' = {
 		protocols: [
 			'https'
 		]
-		serviceUrl: 'https://${func.properties.hostNames[0]}'
+	}
+
+	resource policy 'policies@2020-12-01' = {
+		name: 'policy'
+		dependsOn: [
+			apimBackend
+		]
+		properties: {
+			value: '<policies>\r\n  <inbound>\r\n    <base />\r\n    <set-backend-service backend-id="${apiName}-${version}" />\r\n  </inbound>\r\n  <backend>\r\n    <base />\r\n  </backend>\r\n  <outbound>\r\n    <base />\r\n  </outbound>\r\n  <on-error>\r\n    <base />\r\n  </on-error>\r\n</policies>'
+		}
 	}
 }

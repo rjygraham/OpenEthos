@@ -94,6 +94,13 @@ resource apim 'Microsoft.ApiManagement/service@2020-06-01-preview' = {
 			'Microsoft.WindowsAzure.ApiManagement.Gateway.Protocols.Server.Http2': 'True'
 		}
 	}
+
+	resource policy 'policies@2020-12-01' = {
+		name: 'policy'
+		properties: {
+			value: '<policies>\r\n  <inbound>\r\n    <authentication-managed-identity resource="${apiOpenIdClientId}" output-token-variable-name="msi-access-token" ignore-error="false" />\r\n    <set-header name="Authorization" exists-action="override">\r\n      <value>@("Bearer " + (string)context.Variables["msi-access-token"])</value>\r\n    </set-header>\r\n  </inbound>\r\n  <backend>\r\n    <forward-request />\r\n  </backend>\r\n  <outbound />\r\n  <on-error />\r\n</policies>'
+		}
+	}
 }
 
 resource storageAccountConnectionStringSecret 'Microsoft.KeyVault/vaults/secrets@2019-09-01' = {
@@ -134,7 +141,7 @@ module inboxApi 'api.bicep' = {
 		apimPricipalId: apim.identity.principalId
 		apiDisplayName: 'Inbox'
 		apiName: 'inbox'
-		apiVersions: identityApiVersions
+		apiVersions: inboxApiVersions
 		serverFarmResourceId: serverFarm.id
 		storageAccountConnectionString: 'DefaultEndpointsProtocol=https;AccountName=${storageAccountName};AccountKey=${listkeys(stg.id, '2020-08-01-preview').keys[0].value}'
 		appInsightsInstrumentationKey: appInsights.properties.InstrumentationKey
@@ -152,7 +159,7 @@ module outboxApi 'api.bicep' = {
 		apimPricipalId: apim.identity.principalId
 		apiDisplayName: 'Outbox'
 		apiName: 'outbox'
-		apiVersions: identityApiVersions
+		apiVersions: outboxApiVersions
 		serverFarmResourceId: serverFarm.id
 		storageAccountConnectionString: 'DefaultEndpointsProtocol=https;AccountName=${storageAccountName};AccountKey=${listkeys(stg.id, '2020-08-01-preview').keys[0].value}'
 		appInsightsInstrumentationKey: appInsights.properties.InstrumentationKey
@@ -170,7 +177,7 @@ module profileApi 'api.bicep' = {
 		apimPricipalId: apim.identity.principalId
 		apiDisplayName: 'Profile'
 		apiName: 'profile'
-		apiVersions: identityApiVersions
+		apiVersions: profileApiVersions
 		serverFarmResourceId: serverFarm.id
 		storageAccountConnectionString: 'DefaultEndpointsProtocol=https;AccountName=${storageAccountName};AccountKey=${listkeys(stg.id, '2020-08-01-preview').keys[0].value}'
 		appInsightsInstrumentationKey: appInsights.properties.InstrumentationKey
