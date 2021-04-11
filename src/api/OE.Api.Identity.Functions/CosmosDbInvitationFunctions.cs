@@ -40,7 +40,7 @@ namespace OE.Api.Identity.Functions
 
 					var jwt = CreateInvitationJwt(invitation);
 
-					var message = CreateInvitationMessage(invitation.Name, invitation.EmailAddress, jwt);
+					var message = CreateInvitationMessage(invitation.InviterName, invitation.InviteeName, invitation.EmailAddress, jwt);
 
 					await graphService.SendEmailAsync(message);
 				}
@@ -52,8 +52,9 @@ namespace OE.Api.Identity.Functions
 			// All parameters send to Azure AD B2C needs to be sent as claims
 			var claims = new List<System.Security.Claims.Claim>
 			{
-				new System.Security.Claims.Claim("email", invitation.EmailAddress, System.Security.Claims.ClaimValueTypes.String, issuer),
-				new System.Security.Claims.Claim("name", invitation.Name, System.Security.Claims.ClaimValueTypes.String, issuer)
+				new System.Security.Claims.Claim("invitation_email", invitation.EmailAddress, System.Security.Claims.ClaimValueTypes.String, issuer),
+				new System.Security.Claims.Claim("extension_ancestorId", invitation.EmailAddress, System.Security.Claims.ClaimValueTypes.String, issuer),
+				new System.Security.Claims.Claim("extension_sponsorId", invitation.EmailAddress, System.Security.Claims.ClaimValueTypes.String, issuer)
 			};
 
 			// Create the token
@@ -65,15 +66,19 @@ namespace OE.Api.Identity.Functions
 			return jwtHandler.WriteToken(token);
 		}
 
-		private Message CreateInvitationMessage(string name, string emailAddress, string jwt)
+		private Message CreateInvitationMessage(string inviterName, string inviteeName, string emailAddress, string jwt)
 		{
 			return new Message
 			{
 				Subject = "OpenEthos Invitation",
 				Body = new ItemBody
 				{
-					ContentType = BodyType.Text,
-					Content = $"Hi {name}!\r\nThis is your invitation to join OpenEthos. Open the link below to redeem the invitation and complete sign-up.\r\n\r\nhttps://www.openethos.io/app?invitation={jwt}\r\n\r\nThanks,\r\nOpenEthos Team"
+					ContentType = BodyType.Html,
+					Content = $@"<p>Hi {inviteeName}!</p>
+					<p>Your friend {inviterName} has invited you to join OpenEthos. Use the link below to complete sign-up process using your Apple, Google, or Microsoft account associated with this email address.</p>
+					<p><a href=""https://www.openethos.io/app?invitation={jwt}"">Redeem Invitation</a></p>
+					<p>Thanks,
+					<br />OpenEthos Team</p>"
 				},
 				From = new Recipient()
 				{
@@ -89,7 +94,7 @@ namespace OE.Api.Identity.Functions
 					{
 						EmailAddress = new EmailAddress
 						{
-							Name = name,
+							Name = inviteeName,
 							Address = emailAddress
 						}
 					}

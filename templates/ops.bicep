@@ -1,10 +1,10 @@
 targetScope = 'resourceGroup'
 
 param location string
-param logAnalyticsName string
+param environmentName string
 
 resource logAnalytics 'Microsoft.OperationalInsights/workspaces@2020-10-01' = {
-	name: logAnalyticsName
+	name: '${environmentName}-ops-logs'
 	location: location
 	properties: {
 		sku: {
@@ -12,3 +12,5 @@ resource logAnalytics 'Microsoft.OperationalInsights/workspaces@2020-10-01' = {
 		}
 	}
 }
+
+output logAnalyticsName string = logAnalytics.name

@@ -2,6 +2,7 @@ targetScope = 'resourceGroup'
 
 param location string
 param environmentRegionName string
+param keyVaultName string
 param apimName string
 param apimPricipalId string
 param apiDisplayName string
@@ -32,6 +33,7 @@ module apiVersion 'api-version.bicep' = [for version in apiVersions: {
   params: {
     location: location
     environmentRegionName: environmentRegionName
+    keyVaultName: keyVaultName
     apimName: apimName
     apimPricipalId: apimPricipalId
 	  apiDisplayName: apiDisplayName

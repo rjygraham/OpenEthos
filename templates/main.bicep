@@ -18,7 +18,6 @@ var regionMap = {
 	eastus: 'eus'
 	westus: 'wus'
 }
-var logAnalyticsName = '${environmentName}-ops-logs'
 
 resource sharedResourceGroup 'Microsoft.Resources/resourceGroups@2020-06-01' = {
 	name: sharedResourceGroupName
@@ -43,7 +42,7 @@ module opsDeployment 'ops.bicep' = {
 	scope: resourceGroup(opsResourceGroupName)
 	params: {
 		location: location
-		logAnalyticsName: logAnalyticsName
+		environmentName: environmentName
 	}
 }
 
@@ -69,8 +68,10 @@ module regionDeployments 'region.bicep' = [for region in regions: {
 	params: {
 		location: location
 		environmentRegionName: '${environmentName}-${regionMap[region]}'
+		sharedResourceGoupName: sharedResourceGroupName
 		opsResourceGroupName: opsResourceGroupName
-		logAnalyticsName: logAnalyticsName
+		cosmosDbName: sharedDeployment.outputs.cosmosDbName
+		logAnalyticsName: opsDeployment.outputs.logAnalyticsName
 		identityApiVersions: identityApiVersions
 		inboxApiVersions: inboxApiVersions
 		outboxApiVersions: outboxApiVersions

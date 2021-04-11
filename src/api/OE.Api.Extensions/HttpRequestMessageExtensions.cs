@@ -62,11 +62,13 @@ namespace OE.Api.Extensions
 				return null;
 			}
 
+			var displayName = request.Headers.GetValues(Constants.Headers.UserDisplayName).First();
 			model.Actor = new HashSet<ActivityStreamsBase>
 			{
 				new Person
 				{
-					Id = userId
+					Id = userId,
+					Name = new Dictionary<string, string> { { "mul", displayName } }
 				}
 			};
 

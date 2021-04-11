@@ -5,7 +5,7 @@ param environmentName string
 
 var cosmosName = '${environmentName}-cosmos'
 
-resource cosmos 'Microsoft.DocumentDB/databaseAccounts@2020-06-01-preview' = {
+resource cosmosDb 'Microsoft.DocumentDB/databaseAccounts@2020-06-01-preview' = {
   name: cosmosName
   location: location
   properties: {
@@ -19,3 +19,5 @@ resource cosmos 'Microsoft.DocumentDB/databaseAccounts@2020-06-01-preview' = {
     ]
   }
 }
+
+output cosmosDbName string = cosmosDb.name

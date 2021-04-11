@@ -2,6 +2,7 @@ targetScope = 'resourceGroup'
 
 param location string
 param environmentRegionName string
+param keyVaultName string
 param apimName string
 param apimPricipalId string
 param apiDisplayName string
@@ -14,6 +15,20 @@ param apiOpenIdIssuer string
 param apiOpenIdClientId string
 
 var functionAppName = '${environmentRegionName}-${apiName}-${version}-func'
+var defaultSettings = {
+	'WEBSITE_MOUNT_ENABLED': '1'
+	'WEBSITE_RUN_FROM_PACKAGE': '1'
+}
+var constantSettings = {
+	'APPINSIGHTS_INSTRUMENTATIONKEY': appInsightsInstrumentationKey
+	'APPLICATIONINSIGHTS_CONNECTION_STRING': 'InstrumentationKey=${appInsightsInstrumentationKey};'
+	'AzureWebJobsStorage': storageAccountConnectionString
+	'FUNCTIONS_EXTENSION_VERSION': '~3'
+	'FUNCTIONS_WORKER_RUNTIME': 'dotnet'
+	'NOOP_AUTHENTICATION_SECRET': ''
+	'CosmosDbSqlConnection': '@Microsoft.KeyVault(VaultName=${keyVaultName};SecretName=CosmosDbConnectionString)'
+}
+var newSettings = {}
 
 resource func 'Microsoft.Web/sites@2020-06-01' = {
 	name: functionAppName
@@ -25,41 +40,6 @@ resource func 'Microsoft.Web/sites@2020-06-01' = {
 	properties: {
 		httpsOnly: true
 		siteConfig: {
-			appSettings: [
-				{
-					name: 'APPINSIGHTS_INSTRUMENTATIONKEY'
-					value: appInsightsInstrumentationKey
-				}
-				{
-					name: 'APPLICATIONINSIGHTS_CONNECTION_STRING'
-					value: 'InstrumentationKey=${appInsightsInstrumentationKey};'
-				}
-				{
-					name: 'FUNCTIONS_WORKER_RUNTIME'
-					value: 'dotnet-isolated'
-				}
-				{
-					name: 'FUNCTIONS_EXTENSION_VERSION'
-					value: '~3'
-				}
-				{
-					name: 'AzureWebJobsStorage'
-					value: storageAccountConnectionString
-				}
-				{
-					name: 'WEBSITE_MOUNT_ENABLED'
-					value: '1'
-				}
-				{
-					name: 'WEBSITE_RUN_FROM_PACKAGE'
-					value: '1'
-				}
-				{
-					name: 'NOOP_AUTHENTICATION_SECRET'
-					value: ''
-				}
-			]
-			netFrameworkVersion: 'v5.0'
 			http20Enabled: true
 			minTlsVersion: '1.2'
 			scmMinTlsVersion: '1.2'
@@ -67,54 +47,85 @@ resource func 'Microsoft.Web/sites@2020-06-01' = {
 		}
 		serverFarmId: serverFarmResourceId
 	}
+}
 
-	resource auth 'config' = {
-		name: 'authsettingsV2'
-		properties: {
-			platform: {
+// Create symbolic resource name to get resource Id of appsettings resource.
+resource existingSettings 'Microsoft.Web/sites/config@2020-10-01' existing = {
+	name: '${functionAppName}/appsettings'
+}
+
+module funcAppSettingsDeployment 'api-version-appsettings.bicep' = {
+	name: '${functionAppName}.appsettings'
+	params: {
+		functionAppName: func.name
+		defaultSettings: defaultSettings
+		existingSettings: list(existingSettings.id, '2020-10-01').properties
+		constantSettings: constantSettings
+		newSettings: newSettings
+	}
+}
+
+resource funcAppAuthSettings 'Microsoft.Web/sites/config@2020-10-01' = {
+	name: '${functionAppName}/authsettingsV2'
+	dependsOn: [
+		funcAppSettingsDeployment
+	]
+	properties: {
+		platform: {
+			enabled: true
+		}
+		globalValidation: {
+			requireAuthentication: true
+			unauthenticatedClientAction: 'Return403'
+			redirectToProvider: 'azureactivedirectory'
+		}
+		identityProviders: {
+			azureActiveDirectory: {
 				enabled: true
-			}
-			globalValidation: {
-				requireAuthentication: true
-				unauthenticatedClientAction: 'Return403'
-				redirectToProvider: 'azureactivedirectory'
-			}
-			identityProviders: {
-				azureActiveDirectory: {
-					enabled: true
-					registration: {
-						openIdIssuer: apiOpenIdIssuer
-						clientId: apiOpenIdClientId
-						clientSecretSettingName: 'NOOP_AUTHENTICATION_SECRET'
-					}
-					login: {
-						disableWWWAuthenticate: false
-					}
-					validation: {
-						jwtClaimChecks: {}
-						allowedAudiences: [
-							apiOpenIdClientId
-						]
-						allowedClientApplications: [
-							apimPricipalId
-						]
-					}
-					isAutoProvisioned: true
+				registration: {
+					openIdIssuer: apiOpenIdIssuer
+					clientId: apiOpenIdClientId
+					clientSecretSettingName: 'NOOP_AUTHENTICATION_SECRET'
 				}
+				login: {
+					disableWWWAuthenticate: false
+				}
+				validation: {
+					jwtClaimChecks: {}
+					allowedAudiences: [
+						apiOpenIdClientId
+					]
+					allowedClientApplications: [
+						apimPricipalId
+					]
+				}
+				isAutoProvisioned: true
 			}
 		}
 	}
 }
 
-resource hostKey 'Microsoft.Web/sites/host/functionkeys@2020-06-01' = {
-	name: '${func.name}/default/apim'
+resource apimFunctionKeyNamedValue 'Microsoft.ApiManagement/service/namedValues@2020-12-01' = {
+	name: '${apimName}/${func.name}-key'
+	dependsOn: [
+		funcAppAuthSettings
+	]
 	properties: {
-		name: 'apim'
+		displayName: '${func.name}-key'
+		secret: true
+		value: listkeys('${func.id}/host/default', '2020-06-01').functionKeys.default
+		tags: [
+			'key'
+			'function'
+		]
 	}
 }
 
 resource apimBackend 'Microsoft.ApiManagement/service/backends@2020-06-01-preview' = {
 	name: '${apimName}/${apiName}-${version}'
+	dependsOn: [
+		apimFunctionKeyNamedValue
+	]
 	properties: {
 		protocol: 'http'
 		url: 'https://${func.properties.hostNames[0]}/api'
@@ -122,7 +133,8 @@ resource apimBackend 'Microsoft.ApiManagement/service/backends@2020-06-01-previe
 		credentials: {
 			header: {
 				'x-functions-key': [
-					listkeys('${func.id}/host/default/', '2020-06-01').functionKeys.apim
+					//listkeys('${func.id}/host/default/', '2020-06-01').functionKeys.default
+					'{{${func.name}-key}}'
 				]
 			}
 		}

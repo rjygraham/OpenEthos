@@ -43,7 +43,7 @@ namespace OE.Mobile.ViewModels
 				{
 				new Person
 					{
-						Name = new Dictionary<string, string> { { "en", this.Name } },
+						Name = new Dictionary<string, string> { { "mul", this.Name } },
 						Username = EmailAddress
 					}
 				}

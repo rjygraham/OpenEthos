@@ -3,6 +3,8 @@ targetScope = 'resourceGroup'
 param location string
 param environmentRegionName string
 param opsResourceGroupName string
+param sharedResourceGoupName string
+param cosmosDbName string
 param logAnalyticsName string
 param identityApiVersions array
 param inboxApiVersions array
@@ -19,6 +21,11 @@ var storageAccountName = toLower(replace('${environmentRegionName}funcstg', '-',
 var apimName = '${environmentRegionName}-apim'
 var keyVaultName = '${environmentRegionName}-kvlt'
 
+resource cosmosDb 'Microsoft.DocumentDB/databaseAccounts@2021-03-01-preview' existing = {
+	name: cosmosDbName
+	scope: resourceGroup(sharedResourceGoupName)
+}
+
 resource logAnalytics 'Microsoft.OperationalInsights/workspaces@2020-10-01' existing = {
 	name: logAnalyticsName
 	scope: resourceGroup(opsResourceGroupName)
@@ -27,7 +34,7 @@ resource logAnalytics 'Microsoft.OperationalInsights/workspaces@2020-10-01' exis
 resource serverFarm 'Microsoft.Web/serverfarms@2020-06-01' = {
 	name: serverFarmName
 	location: location
-	kind: 'windows'
+	kind: 'functionapp'
 	properties: {
 		reserved: true
 	}
@@ -70,6 +77,14 @@ resource keyVault 'Microsoft.KeyVault/vaults@2019-09-01' = {
     enableSoftDelete: true
     enableRbacAuthorization: true
 	}
+
+	resource cosmosDbConnectionStringSecret 'secrets' = {
+		name: 'CosmosDbConnectionString'
+		properties: {
+			value: 'AccountEndpoint=https://${cosmosDb.name}.documents.azure.com:443/;AccountKey=${listkeys(cosmosDb.id, '2021-03-01-preview').primaryMasterKey};'
+		}
+	}
+
 }
 
 resource apim 'Microsoft.ApiManagement/service@2020-06-01-preview' = {
@@ -119,6 +134,7 @@ module identityApi 'api.bicep' = {
 	params: {
 		location: location
 		environmentRegionName: environmentRegionName
+		keyVaultName: keyVault.name
 		apimName: apim.name
 		apimPricipalId: apim.identity.principalId
 		apiDisplayName: 'Identity'
@@ -137,6 +153,7 @@ module inboxApi 'api.bicep' = {
 	params: {
 		location: location
 		environmentRegionName: environmentRegionName
+		keyVaultName: keyVault.name
 		apimName: apim.name
 		apimPricipalId: apim.identity.principalId
 		apiDisplayName: 'Inbox'
@@ -155,6 +172,7 @@ module outboxApi 'api.bicep' = {
 	params: {
 		location: location
 		environmentRegionName: environmentRegionName
+		keyVaultName: keyVault.name
 		apimName: apim.name
 		apimPricipalId: apim.identity.principalId
 		apiDisplayName: 'Outbox'
@@ -173,6 +191,7 @@ module profileApi 'api.bicep' = {
 	params: {
 		location: location
 		environmentRegionName: environmentRegionName
+		keyVaultName: keyVault.name
 		apimName: apim.name
 		apimPricipalId: apim.identity.principalId
 		apiDisplayName: 'Profile'

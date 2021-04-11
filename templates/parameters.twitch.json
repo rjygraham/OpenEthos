@@ -1,0 +1,46 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "location": {
+            "value": "eastus"
+        },
+        "appName": {
+            "value": "oe"
+        },
+        "environment": {
+            "value": "twitch"
+        },
+        "regions": {
+            "value": [
+                "eastus"
+            ]
+        },
+        "identityApiVersions": {
+            "value": [
+                "2021-04-10"
+            ]
+        },
+        "inboxApiVersions": {
+            "value": [
+                "2021-04-10"
+            ]
+        },
+        "outboxApiVersions": {
+            "value": [
+                "2021-04-10"
+            ]
+        },
+        "profileApiVersions": {
+            "value": [
+                "2021-04-10"
+            ]
+        },
+        "apiOpenIdIssuer": {
+            "value": "https://sts.windows.net/c8c22f13-9f4d-41a5-b619-eda5a1d50c39/"
+        },
+        "apiOpenIdClientId": {
+            "value": "3256f27b-a594-4e08-91f5-a03f03ec5fca"
+        }
+    }
+}

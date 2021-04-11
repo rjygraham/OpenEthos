@@ -81,7 +81,7 @@ namespace OE.Mobile.ViewModels
 			Device.BeginInvokeOnMainThread(() =>
 			{
 				Username = profileResponse.Username;
-				DisplayName = profileResponse.Name["en"];
+				DisplayName = profileResponse.Name["mul"];
 			});
 		}
 	}

@@ -8,7 +8,7 @@ using OE.Api.Extensions;
 using System.Net.Http;
 using System.Threading.Tasks;
 
-namespace OE.Api.Outbox
+namespace OE.Api.Outbox.Functions
 {
 	public class HttpOutboxFunctions
     {

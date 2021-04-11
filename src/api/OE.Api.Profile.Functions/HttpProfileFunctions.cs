@@ -29,7 +29,7 @@ namespace OE.Api.Profile
 				var model = new Models.ActivityStreams.Person
 				{
 					Id = userId,
-					Name = new Dictionary<string, string> { { "en", request.Headers.GetValues(Constants.Headers.UserDisplayName).First() } },
+					Name = new Dictionary<string, string> { { "mul", request.Headers.GetValues(Constants.Headers.UserDisplayName).First() } },
 					Username = request.Headers.GetValues(Constants.Headers.UserPrincipalName).First()
 				};
 

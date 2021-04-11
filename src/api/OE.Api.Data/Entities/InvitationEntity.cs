@@ -8,11 +8,14 @@ namespace OE.Api.Data.Entities
 		[JsonProperty("id")]
 		public string EmailAddress { get; set; }
 
+		[JsonProperty("inviteeName")]
+		public string InviteeName { get; set; }
+
 		[JsonProperty("ancestorId")]
 		public string AncestorId { get; set; }
 
-		[JsonProperty("name")]
-		public string Name { get; set; }
+		[JsonProperty("inviterName")]
+		public string InviterName { get; set; }
 
 		[JsonProperty("createTimestamp")]
 		public DateTimeOffset CreateTimestamp { get; set; }

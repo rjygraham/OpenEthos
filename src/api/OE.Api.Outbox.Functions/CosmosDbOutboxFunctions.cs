@@ -52,7 +52,7 @@ namespace OE.Api.Outbox.Functions
 			{
 				EmailAddress = to.Username,
 				AncestorId = outboxEntity.UserId,
-				Name = to.Name["en"],
+				InviteeName = to.Name["mul"],
 				CreateTimestamp = invite.Published.Value,
 				ExpirationTimestamp = invite.Published.Value.AddHours(48)
 			};

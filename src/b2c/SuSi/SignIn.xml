@@ -51,21 +51,44 @@
 
 	</ClaimsProviders> -->
 
-	<!-- <UserJourneys>
-		
-	</UserJourneys> -->
+	<UserJourneys>
+		<UserJourney Id="SignIn">
+			<OrchestrationSteps>
+				<OrchestrationStep Order="1" Type="CombinedSignInAndSignUp" ContentDefinitionReferenceId="api.idpselections.signup">
+					<ClaimsProviderSelections>
+						<ClaimsProviderSelection TargetClaimsExchangeId="GoogleExchange" />
+						<ClaimsProviderSelection TargetClaimsExchangeId="MicrosoftAccountExchange" />
+					</ClaimsProviderSelections>
+				</OrchestrationStep>
 
-	<!-- <RelyingParty>
-		<DefaultUserJourney ReferenceId="InvitationSignUp" />
+				<OrchestrationStep Order="2" Type="ClaimsExchange">
+					<ClaimsExchanges>
+						<ClaimsExchange Id="MicrosoftAccountExchange" TechnicalProfileReferenceId="MSA-OIDC" />
+						<ClaimsExchange Id="GoogleExchange" TechnicalProfileReferenceId="Google-OAuth2" />
+					</ClaimsExchanges>
+				</OrchestrationStep>
+
+				<!-- For social IDP authentication, attempt to find the user account in the directory. -->
+				<OrchestrationStep Order="3" Type="ClaimsExchange">
+					<ClaimsExchanges>
+						<ClaimsExchange Id="AADUserReadUsingAlternativeSecurityId" TechnicalProfileReferenceId="AAD-UserReadUsingAlternativeSecurityId-NoError" />
+					</ClaimsExchanges>
+				</OrchestrationStep>
+
+				<!-- Issue the access token -->
+				<OrchestrationStep Order="4" Type="SendClaims" CpimIssuerTechnicalProfileReferenceId="JwtIssuer" />
+			</OrchestrationSteps>
+		</UserJourney>
+	</UserJourneys>
+
+	<RelyingParty>
+		<DefaultUserJourney ReferenceId="SignIn" />
 		<UserJourneyBehaviors>
 			<JourneyInsights TelemetryEngine="ApplicationInsights" InstrumentationKey="{{B2C_APPINSIGHTS_INSTRUMENTATIONKEY}}" DeveloperMode="{{B2C_APPINSIGHTS_DEVELOPERMODE}}" ClientEnabled="false" ServerEnabled="true" TelemetryVersion="1.0.0" />
 		</UserJourneyBehaviors>
 		<TechnicalProfile Id="PolicyProfile">
 			<DisplayName>PolicyProfile</DisplayName>
 			<Protocol Name="OpenIdConnect" />
-			<InputClaims>
-				<InputClaim ClaimTypeReferenceId="email" />
-			</InputClaims>
 			<OutputClaims>
 				<OutputClaim ClaimTypeReferenceId="email" />
 				<OutputClaim ClaimTypeReferenceId="extension_ancestorId" PartnerClaimType="ancestor" />
@@ -77,6 +100,6 @@
 			</OutputClaims>
 			<SubjectNamingInfo ClaimType="sub" />
 		</TechnicalProfile>
-	</RelyingParty> -->
+	</RelyingParty>
 
 </TrustFrameworkPolicy>
