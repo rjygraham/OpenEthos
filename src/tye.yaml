@@ -1,0 +1,22 @@
+name: openethos
+services:
+# - name: identity
+#   azureFunction: api/OE.Api.Identity.Functions
+# - name: profile
+#   azureFunction: api/OE.Api.Profile.Functions
+# - name: outbox
+#   azureFunction: api/OE.Api.Outbox.Functions
+# - name: inbox
+#   azureFunction: api/OE.Api.Inbox.Functions
+# - name: proxy
+#   project: api/OE.DevProxy/OE.DevProxy.csproj
+#   bindings:
+#   - port: 5000
+# - name: ngrok
+#   executable: ngrok
+- name: ngrok
+  executable: ngrok 
+  args: http 5000
+- name: ngrok-script
+  executable: pwsh 
+  args: Set-NgrokEnvironmentVariable.ps1

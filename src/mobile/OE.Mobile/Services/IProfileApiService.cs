@@ -1,4 +1,5 @@
 ﻿using OE.Models;
+using OE.Models.ActivityStreams;
 using Refit;
 using System.Threading.Tasks;
 
@@ -8,6 +9,6 @@ namespace OE.Mobile.Services
 	public interface IProfileApiService
 	{
 		[Get("/profile/{userId}")]
-		Task<Profile> GetProfile(string userId);
+		Task<Person> GetProfileAsync(string userId);
 	}
 }

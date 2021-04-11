@@ -53,7 +53,7 @@ namespace OE.Models.ActivityStreams
 		/// activity concluded or is expected to conclude. 
 		/// </summary>
 		[JsonProperty("endTime")]
-		public DateTime? EndTime { get; set; }
+		public DateTimeOffset? EndTime { get; set; }
 
 		/// <summary>
 		/// Identifies the entity (e.g. an application) that generated the object. 
@@ -97,7 +97,7 @@ namespace OE.Models.ActivityStreams
 		/// The date and time at which the object was published
 		/// </summary>
 		[JsonProperty("published")]
-		public DateTime? Published { get; set; }
+		public DateTimeOffset? Published { get; set; }
 
 		/// <summary>
 		/// Identifies a Collection containing objects considered to be responses to this object. 
@@ -111,7 +111,7 @@ namespace OE.Models.ActivityStreams
 		/// moment the activity began or is scheduled to begin.
 		/// </summary>
 		[JsonProperty("startTime")]
-		public DateTime? StartTime { get; set; }
+		public DateTimeOffset? StartTime { get; set; }
 
 		/// <summary>
 		/// One or more "tags" that have been associated with an objects. A tag can be any kind of 
@@ -125,7 +125,7 @@ namespace OE.Models.ActivityStreams
 		/// The date and time at which the object was updated.
 		/// </summary>
 		[JsonProperty("updated")]
-		public DateTime? Updated { get; set; }
+		public DateTimeOffset? Updated { get; set; }
 
 		/// <summary>
 		/// Identifies one or more links to representations of the object 

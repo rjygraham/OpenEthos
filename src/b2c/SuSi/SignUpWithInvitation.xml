@@ -1,0 +1,262 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<TrustFrameworkPolicy
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	xmlns="http://schemas.microsoft.com/online/cpim/schemas/2013/06"
+	PolicySchemaVersion="0.3.0.0"
+	TenantId="{{B2C_TENANTID}}"
+	PolicyId="B2C_1A_SU_Invitation"
+	PublicPolicyUri="http://{{B2C_TENANTID}}/B2C_1A_SU_Invitation"
+	DeploymentMode="{{B2C_DEPLOYMENTMODE}}"
+	UserJourneyRecorderEndpoint="urn:journeyrecorder:applicationinsights">
+
+	<BasePolicy>
+		<TenantId>{{B2C_TENANTID}}</TenantId>
+		<PolicyId>B2C_1A_TrustFrameworkExtensions</PolicyId>
+	</BasePolicy>
+
+	 <BuildingBlocks>
+
+		<ClaimsSchema>
+			<!--Sample: Stores the error message for unsolicited request (a request without id_token_hint) and user not found-->
+			<ClaimType Id="errorMessage">
+		 		<DisplayName>Error</DisplayName>
+		 		<DataType>string</DataType>
+				<UserHelpText>Add help text here</UserHelpText>
+		 		<UserInputType>Paragraph</UserInputType>
+			</ClaimType>
+
+		</ClaimsSchema>
+
+		<ClaimsTransformations>
+			<!-- Initiates the errorMessage claims type with the error message -->
+			<ClaimsTransformation Id="CreateUnsolicitedErrorMessage" TransformationMethod="CreateStringClaim">
+				<InputParameters>
+					<InputParameter Id="value" DataType="string" Value="You cannot sign-up without invitation" />
+				</InputParameters>
+				<OutputClaims>
+					<OutputClaim ClaimTypeReferenceId="errorMessage" TransformationClaimType="createdClaim" />
+				</OutputClaims>
+			</ClaimsTransformation>
+		</ClaimsTransformations>
+	</BuildingBlocks>
+
+	<ClaimsProviders>
+		<!--Sample: This technical profile specifies how B2C should validate your token, and what claims you want B2C to extract from the token. 
+			The METADATA value in the TechnicalProfile meta-data is required. 
+			The “IdTokenAudience” and “issuer” arguments are optional (see later section)-->
+		<ClaimsProvider>
+			<DisplayName>ID Token Hint ClaimsProvider</DisplayName>
+			<TechnicalProfiles>
+				<TechnicalProfile Id="IdTokenHint_ExtractClaims">
+					<DisplayName>ID Token Hint TechnicalProfile</DisplayName>
+					<Protocol Name="None" />
+					<Metadata>
+						<!--Sample action required: replace with your endpoint location -->
+						<Item Key="METADATA">https://{{B2C_HOSTNAME}}/{{B2C_TENANTID}}/v2.0/.well-known/openid-configuration?p=B2C_1A_Invitation</Item>
+						<Item Key="issuer">https://{{B2C_HOSTNAME}}/{{B2C_TENANTOBJECTID}}/v2.0/</Item>
+						<Item Key="IdTokenAudience">{{B2C_ID_TOKEN_HINT_AUDIENCE}}</Item>
+					</Metadata>
+					<CryptographicKeys>
+						<Key Id="client_secret" StorageReferenceId="{{B2C_ID_TOKEN_HINT_CERT}}" />
+					</CryptographicKeys>
+					<OutputClaims>
+						<!-- Read the claims from the id_token_hint -->
+						<OutputClaim ClaimTypeReferenceId="email" />
+					</OutputClaims>
+				</TechnicalProfile>
+			</TechnicalProfiles>
+		</ClaimsProvider>
+
+		<ClaimsProvider>
+			<DisplayName>REST APIs</DisplayName>
+			<TechnicalProfiles>
+				<TechnicalProfile Id="REST-GetInvitation">
+					<DisplayName>Get Invitation</DisplayName>
+					<Protocol Name="Proprietary" Handler="Web.TPEngine.Providers.RestfulProvider, Web.TPEngine, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" />
+					<Metadata>
+						<Item Key="ServiceUrl">{{API_HOST_URL}}/identity/invitations/get</Item>
+						<Item Key="AuthenticationType">None</Item>
+						<Item Key="SendClaimsIn">Body</Item>
+					</Metadata>
+					<InputClaims>
+						<InputClaim ClaimTypeReferenceId="email" />
+					</InputClaims>
+					<OutputClaims>
+						<OutputClaim ClaimTypeReferenceId="extension_ancestorId" PartnerClaimType="ancestor" />
+						<OutputClaim ClaimTypeReferenceId="extension_sponsorId" PartnerClaimType="sponsor" />
+					</OutputClaims>
+					<UseTechnicalProfileForSessionManagement ReferenceId="SM-Noop" />
+				</TechnicalProfile>
+
+				<TechnicalProfile Id="REST-RedeemInvitation">
+					<DisplayName>Get Invitation</DisplayName>
+					<Protocol Name="Proprietary" Handler="Web.TPEngine.Providers.RestfulProvider, Web.TPEngine, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" />
+					<Metadata>
+						<Item Key="ServiceUrl">{{API_HOST_URL}}/identity/invitations/redeem</Item>
+						<Item Key="AuthenticationType">None</Item>
+						<Item Key="SendClaimsIn">Body</Item>
+					</Metadata>
+					<InputClaims>
+						<InputClaim ClaimTypeReferenceId="email" />
+					</InputClaims>
+					<UseTechnicalProfileForSessionManagement ReferenceId="SM-Noop" />
+				</TechnicalProfile>
+			</TechnicalProfiles>
+		</ClaimsProvider>
+
+		<ClaimsProvider>
+			<DisplayName>Self Asserted</DisplayName>
+			<TechnicalProfiles>
+
+				<TechnicalProfile Id="SelfAsserted-Social">
+					<InputClaims>
+						<!-- These claims ensure that any values retrieved in the previous steps (e.g. from an external IDP) are prefilled. 
+							Note that some of these claims may not have any value, for example, if the external IDP did not provide any of
+							these values, or if the claim did not appear in the OutputClaims section of the IDP.
+							In addition, if a claim is not in the InputClaims section, but it is in the OutputClaims section, then its
+							value will not be prefilled, but the user will still be prompted for it (with an empty value). -->
+					</InputClaims>
+					<OutputClaims>
+						<!-- These claims are not shown to the user because their value is obtained through the "ValidationTechnicalProfiles"
+							referenced below, or a default value is assigned to the claim. A claim is only shown to the user to provide a 
+							value if its value cannot be obtained through any other means. -->
+							<OutputClaim ClaimTypeReferenceId="displayName" />
+					</OutputClaims>
+					<ValidationTechnicalProfiles>
+						<ValidationTechnicalProfile ReferenceId="REST-GetInvitation" />
+						<ValidationTechnicalProfile ReferenceId="REST-RedeemInvitation" />
+					</ValidationTechnicalProfiles>
+				</TechnicalProfile>
+
+				<!-- Show error message-->
+				<TechnicalProfile Id="SelfAsserted-Error">
+					<DisplayName>Unsolicited error message</DisplayName>
+					<Protocol Name="Proprietary" Handler="Web.TPEngine.Providers.SelfAssertedAttributeProvider, Web.TPEngine, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null"/>
+					<Metadata>
+						<Item Key="ContentDefinitionReferenceId">api.selfasserted</Item>
+						<!-- Remove the continue button-->
+						<Item Key="setting.showContinueButton">false</Item>
+				 </Metadata>
+					<InputClaims>
+						<InputClaim ClaimTypeReferenceId="errorMessage"/>
+					</InputClaims>
+					<OutputClaims>
+						<OutputClaim ClaimTypeReferenceId="errorMessage"/>
+					</OutputClaims>
+				</TechnicalProfile>
+
+				<!-- Show unsolicited error message-->
+				<TechnicalProfile Id="SelfAsserted-Unsolicited">
+					<InputClaimsTransformations>
+						<InputClaimsTransformation ReferenceId="CreateUnsolicitedErrorMessage" />
+					</InputClaimsTransformations>
+					<IncludeTechnicalProfile ReferenceId="SelfAsserted-Error" />
+				</TechnicalProfile>
+			</TechnicalProfiles>
+		</ClaimsProvider>
+
+	</ClaimsProviders>
+
+	<UserJourneys>
+		<UserJourney Id="InvitationSignUp">
+			<OrchestrationSteps>
+				
+				<!-- Read the input claims from the id_token_hint-->
+				<OrchestrationStep Order="1" Type="GetClaims" CpimIssuerTechnicalProfileReferenceId="IdTokenHint_ExtractClaims" />
+
+				<!-- Validate user has invitation -->
+				<OrchestrationStep Order="2" Type="ClaimsExchange">
+				 	<Preconditions>
+						<Precondition Type="ClaimsExist" ExecuteActionsIf="true">
+							<Value>email</Value>
+							<Action>SkipThisOrchestrationStep</Action>
+						</Precondition>
+					</Preconditions>
+					<ClaimsExchanges>
+						<ClaimsExchange Id="SelfAsserted-Unsolicited" TechnicalProfileReferenceId="SelfAsserted-Unsolicited" />
+					</ClaimsExchanges>
+				</OrchestrationStep>
+
+				<!-- Begin social IDP provider flow -->
+				<OrchestrationStep Order="3" Type="CombinedSignInAndSignUp" ContentDefinitionReferenceId="api.idpselections.signup">
+					<ClaimsProviderSelections>
+						<ClaimsProviderSelection TargetClaimsExchangeId="GoogleExchange" />
+						<ClaimsProviderSelection TargetClaimsExchangeId="MicrosoftAccountExchange" />
+					</ClaimsProviderSelections>
+				</OrchestrationStep>
+
+				<OrchestrationStep Order="4" Type="ClaimsExchange">
+					<ClaimsExchanges>
+						<ClaimsExchange Id="MicrosoftAccountExchange" TechnicalProfileReferenceId="MSA-OIDC" />
+						<ClaimsExchange Id="GoogleExchange" TechnicalProfileReferenceId="Google-OAuth2" />
+					</ClaimsExchanges>
+				</OrchestrationStep>
+
+				<!-- For social IDP authentication, attempt to find the user account in the directory. -->
+				<OrchestrationStep Order="5" Type="ClaimsExchange">
+					<ClaimsExchanges>
+						<ClaimsExchange Id="AADUserReadUsingAlternativeSecurityId" TechnicalProfileReferenceId="AAD-UserReadUsingAlternativeSecurityId-NoError" />
+					</ClaimsExchanges>
+				</OrchestrationStep>
+
+				<!-- Show self-asserted page only if the directory does not have the user account already (i.e. we do not have an objectId).  -->
+				<OrchestrationStep Order="6" Type="ClaimsExchange">
+					<Preconditions>
+						<Precondition Type="ClaimsExist" ExecuteActionsIf="true">
+							<Value>objectId</Value>
+							<Action>SkipThisOrchestrationStep</Action>
+						</Precondition>
+					</Preconditions>
+					<ClaimsExchanges>
+						<ClaimsExchange Id="SelfAsserted-Social" TechnicalProfileReferenceId="SelfAsserted-Social" />
+					</ClaimsExchanges>
+				</OrchestrationStep>
+
+				<!-- The previous step (SelfAsserted-Social) could have been skipped if there were no attributes to collect 
+						 from the user. So, in that case, create the user in the directory if one does not already exist 
+						 (verified using objectId which would be set from the last step if account was created in the directory. -->
+				<OrchestrationStep Order="7" Type="ClaimsExchange">
+					<Preconditions>
+						<Precondition Type="ClaimsExist" ExecuteActionsIf="true">
+							<Value>objectId</Value>
+							<Action>SkipThisOrchestrationStep</Action>
+						</Precondition>
+					</Preconditions>
+					<ClaimsExchanges>
+						<ClaimsExchange Id="AADUserWrite" TechnicalProfileReferenceId="AAD-UserWriteUsingAlternativeSecurityId" />
+					</ClaimsExchanges>
+				</OrchestrationStep>
+
+				<!-- Issue the access token -->
+				<OrchestrationStep Order="8" Type="SendClaims" CpimIssuerTechnicalProfileReferenceId="JwtIssuer" />
+		
+			</OrchestrationSteps>
+			<ClientDefinition ReferenceId="DefaultWeb" />
+		</UserJourney>
+	</UserJourneys>
+
+	<RelyingParty>
+		<DefaultUserJourney ReferenceId="InvitationSignUp" />
+		<UserJourneyBehaviors>
+			<JourneyInsights TelemetryEngine="ApplicationInsights" InstrumentationKey="{{B2C_APPINSIGHTS_INSTRUMENTATIONKEY}}" DeveloperMode="{{B2C_APPINSIGHTS_DEVELOPERMODE}}" ClientEnabled="false" ServerEnabled="true" TelemetryVersion="1.0.0" />
+		</UserJourneyBehaviors>
+		<TechnicalProfile Id="PolicyProfile">
+			<DisplayName>PolicyProfile</DisplayName>
+			<Protocol Name="OpenIdConnect" />
+			<InputClaims>
+				<InputClaim ClaimTypeReferenceId="email" />
+			</InputClaims>
+			<OutputClaims>
+				<OutputClaim ClaimTypeReferenceId="email" />
+				<OutputClaim ClaimTypeReferenceId="extension_ancestorId" PartnerClaimType="ancestor" />
+				<OutputClaim ClaimTypeReferenceId="extension_sponsorId" PartnerClaimType="sponsor" />
+				<OutputClaim ClaimTypeReferenceId="displayName" PartnerClaimType="name" />
+				<OutputClaim ClaimTypeReferenceId="objectId" PartnerClaimType="sub" />
+				<OutputClaim ClaimTypeReferenceId="identityProvider" />
+				<OutputClaim ClaimTypeReferenceId="tenantId" AlwaysUseDefaultValue="true" DefaultValue="{Policy:TenantObjectId}" />
+			</OutputClaims>
+			<SubjectNamingInfo ClaimType="sub" />
+		</TechnicalProfile>
+	</RelyingParty>
+</TrustFrameworkPolicy>
