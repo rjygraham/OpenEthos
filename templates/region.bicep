@@ -19,15 +19,15 @@ param b2cOpenIdConfigUrl string
 param b2cOpenIdAudience string
 param b2cOpenIdIssuer string
 param aadApisClientId string
-
-@secure()
+param idHintTokenSigningCertificateThumbprint string
+param idHintTokenIssuer string
+param idHintTokenClientId string
 param o365GraphTenantId string
-@secure()
 param o365GraphClientId string
 @secure()
 param o365GraphClientSecret string
-@secure()
 param o365GraphEmailSenderObjectId string
+param identityApiLoadCertificateThumbprints string
 
 var appInsightsName = '${environmentRegionName}-ai'
 var serverFarmName = '${environmentRegionName}-asp'
@@ -110,6 +110,27 @@ resource keyVault 'Microsoft.KeyVault/vaults@2019-09-01' = {
 		name: 'CosmosDb--ConnectionString'
 		properties: {
 			value: 'AccountEndpoint=https://${cosmosDb.name}.documents.azure.com:443/;AccountKey=${listkeys(cosmosDb.id, '2021-03-01-preview').primaryMasterKey};'
+		}
+	}
+
+	resource idHintTokenSigningCertificateThumbprintSecret 'secrets' = {
+		name: 'IdTokenHint--SigningCertificateThumbprint'
+		properties: {
+			value: idHintTokenSigningCertificateThumbprint
+		}
+	}
+
+	resource idTokenHingIssuerSecret 'secrets' = {
+		name: 'IdTokenHint--Issuer'
+		properties: {
+			value: idHintTokenIssuer
+		}
+	}
+
+	resource idTokenHingClientIdSecret 'secrets' = {
+		name: 'IdTokenHint--ClientId'
+		properties: {
+			value: idHintTokenClientId
 		}
 	}
 
@@ -215,6 +236,7 @@ module identityApi 'api.bicep' = {
 		appInsightsInstrumentationKey: appInsights.properties.InstrumentationKey
 		aadOpenIdIssuer: aadOpenIdIssuer
 		aadApisClientId: aadApisClientId
+		websiteLoadCertificateThumbprints: identityApiLoadCertificateThumbprints
 	}
 }
 

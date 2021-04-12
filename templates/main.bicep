@@ -15,14 +15,15 @@ param b2cOpenIdConfigUrl string
 param b2cOpenIdAudience string
 param b2cOpenIdIssuer string
 param aadApisClientId string
-@secure()
+param idHintTokenSigningCertificateThumbprint string
+param idHintTokenIssuer string
+param idHintTokenClientId string
 param o365GraphTenantId string
-@secure()
 param o365GraphClientId string
 @secure()
 param o365GraphClientSecret string
-@secure()
 param o365GraphEmailSenderObjectId string
+param identityApiLoadCertificateThumbprints string
 
 var environmentName = '${appName}-${environment}'
 var sharedResourceGroupName = toUpper('${environmentName}-SHARED')
@@ -98,9 +99,13 @@ module regionDeployments 'region.bicep' = [for region in regions: {
 		b2cOpenIdAudience: b2cOpenIdAudience
 		b2cOpenIdIssuer: b2cOpenIdIssuer
 		aadApisClientId: aadApisClientId
+		idHintTokenSigningCertificateThumbprint: idHintTokenSigningCertificateThumbprint
+		idHintTokenIssuer: idHintTokenIssuer
+		idHintTokenClientId: idHintTokenClientId
 		o365GraphTenantId: o365GraphTenantId
 		o365GraphClientId: o365GraphClientId
 		o365GraphClientSecret: o365GraphClientSecret
 		o365GraphEmailSenderObjectId: o365GraphEmailSenderObjectId
+		identityApiLoadCertificateThumbprints: identityApiLoadCertificateThumbprints
 	}
 }]

@@ -4,16 +4,15 @@ using Microsoft.Azure.Functions.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
-using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
 using OE.Api.Configuration;
 using OE.Api.Data;
 using OE.Api.Identity.Functions;
 using OE.Api.Identity.Functions.Configuration;
+using OE.Api.Identity.Functions.Services;
 using OE.Api.MicrosoftGraph;
 using System;
 using System.Reflection;
-using System.Security.Cryptography.X509Certificates;
 
 [assembly: FunctionsStartup(typeof(Startup))]
 
@@ -53,10 +52,10 @@ namespace OE.Api.Identity.Functions
 			// Set the default Newtonsoft settings to user the custom ActivityStreamsSerializationBinder 
 			JsonConvert.DefaultSettings = () => Constants.Serialization.JsonSerializerSettings;
 
-			builder.Services.AddOptions<IdentityApisConfiguration>()
+			builder.Services.AddOptions<IdHintTokenConfiguration>()
 			.Configure<IConfiguration>((settings, configuration) =>
 			{
-				configuration.GetSection("IdentityApis").Bind(settings);
+				configuration.GetSection("IdTokenHint").Bind(settings);
 			});
 
 			builder.Services.AddOptions<CosmosDbConfiguration>()
@@ -71,7 +70,7 @@ namespace OE.Api.Identity.Functions
 				configuration.GetSection("O365Graph").Bind(settings);
 			});
 
-			builder.Services.AddSingleton(X509SigningCredentialsImplementationFactory);
+			builder.Services.AddSingleton(IdTokenHintImplementationFactory);
 			builder.Services.AddSingleton(IO365GraphServiceImplementationFactory);
 			builder.Services.AddSingleton(CosmosClientImplementationFactory);
 			builder.Services.AddSingleton<IInvitationStore, CosmosDbInvitationStore>();
@@ -94,15 +93,10 @@ namespace OE.Api.Identity.Functions
 			return new CosmosClient(options.Value.ConnectionString, Constants.CosmosDb.ClientOptions);
 		}
 
-		private X509SigningCredentials X509SigningCredentialsImplementationFactory(IServiceProvider serviceProvider)
+		private IIdTokenHintService IdTokenHintImplementationFactory(IServiceProvider serviceProvider)
 		{
-			var options = serviceProvider.GetService<IOptions<IdentityApisConfiguration>>();
-			var thumbprint = options.Value.InvitationTokenSigningCertificateThumbprint;
-			var store = new X509Store(StoreName.My, StoreLocation.CurrentUser);
-			store.Open(OpenFlags.ReadOnly);
-
-			X509Certificate2Collection certCollection = store.Certificates.Find(X509FindType.FindByThumbprint, thumbprint, false);
-			return new X509SigningCredentials(certCollection[0]);
+			var options = serviceProvider.GetService<IOptions<IdHintTokenConfiguration>>();
+			return new IdTokenHintService(options.Value);
 		}
 	}
 }

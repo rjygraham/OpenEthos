@@ -1,29 +1,24 @@
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
 using Microsoft.Graph;
-using Microsoft.IdentityModel.Tokens;
-using OE.Api.Data.Entities;
 using OE.Api.Identity.Functions.Extensions;
+using OE.Api.Identity.Functions.Services;
 using OE.Api.MicrosoftGraph;
-using System;
 using System.Collections.Generic;
-using System.IdentityModel.Tokens.Jwt;
 using System.Threading.Tasks;
 
 namespace OE.Api.Identity.Functions
 {
 	public class CosmosDbInvitationFunctions
 	{
-		private static string issuer = Environment.GetEnvironmentVariable("InvitationTokenIssuer");
-		private static string clientId = Environment.GetEnvironmentVariable("InvitationTokenClientId");
-
+		
 		private readonly IO365GraphService graphService;
-		private readonly X509SigningCredentials signingCredentials;
+		private readonly IIdTokenHintService idTokenHintService;
 
-		public CosmosDbInvitationFunctions(IO365GraphService graphService, X509SigningCredentials signingCredentials)
+		public CosmosDbInvitationFunctions(IO365GraphService graphService, IIdTokenHintService idTokenHintService)
 		{
 			this.graphService = graphService;
-			this.signingCredentials = signingCredentials;
+			this.idTokenHintService = idTokenHintService;
 		}
 
 		[FunctionName(nameof(ProcessInvitationsAsync))]
@@ -38,32 +33,13 @@ namespace OE.Api.Identity.Functions
 				{
 					var invitation = document.ToInvitationEntity();
 
-					var jwt = CreateInvitationJwt(invitation);
+					var jwt = idTokenHintService.GetIdTokenHint(invitation.EmailAddress, invitation.AncestorId, invitation.CreateTimestamp.UtcDateTime, invitation.ExpirationTimestamp.UtcDateTime);
 
 					var message = CreateInvitationMessage(invitation.InviterName, invitation.InviteeName, invitation.EmailAddress, jwt);
 
 					await graphService.SendEmailAsync(message);
 				}
 			}
-		}
-
-		private string CreateInvitationJwt(InvitationEntity invitation)
-		{
-			// All parameters send to Azure AD B2C needs to be sent as claims
-			var claims = new List<System.Security.Claims.Claim>
-			{
-				new System.Security.Claims.Claim("invitation_email", invitation.EmailAddress, System.Security.Claims.ClaimValueTypes.String, issuer),
-				new System.Security.Claims.Claim("extension_ancestorId", invitation.EmailAddress, System.Security.Claims.ClaimValueTypes.String, issuer),
-				new System.Security.Claims.Claim("extension_sponsorId", invitation.EmailAddress, System.Security.Claims.ClaimValueTypes.String, issuer)
-			};
-
-			// Create the token
-			JwtSecurityToken token = new JwtSecurityToken(issuer, clientId, claims, invitation.CreateTimestamp.DateTime, invitation.ExpirationTimestamp.DateTime, signingCredentials);
-
-			// Get the representation of the signed token
-			JwtSecurityTokenHandler jwtHandler = new JwtSecurityTokenHandler();
-
-			return jwtHandler.WriteToken(token);
 		}
 
 		private Message CreateInvitationMessage(string inviterName, string inviteeName, string emailAddress, string jwt)

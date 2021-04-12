@@ -12,6 +12,7 @@ param serverFarmResourceId string
 param appInsightsInstrumentationKey string
 param aadOpenIdIssuer string
 param aadApisClientId string
+param websiteLoadCertificateThumbprints string = ''
 
 @secure()
 param storageAccountConnectionString string
@@ -44,5 +45,6 @@ module apiVersion 'api.version.bicep' = [for version in apiVersions: {
     appInsightsInstrumentationKey: appInsightsInstrumentationKey
     aadOpenIdIssuer: aadOpenIdIssuer
 		aadApisClientId: aadApisClientId
+    websiteLoadCertificateThumbprints: websiteLoadCertificateThumbprints
   }
 }]

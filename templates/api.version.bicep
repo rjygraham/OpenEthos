@@ -13,11 +13,15 @@ param storageAccountConnectionString string
 param appInsightsInstrumentationKey string
 param aadOpenIdIssuer string
 param aadApisClientId string
+param websiteLoadCertificateThumbprints string = ''
 
 var functionAppName = '${environmentRegionName}-${apiName}-${version}-func'
 var defaultSettings = {
 	'WEBSITE_MOUNT_ENABLED': '1'
 	'WEBSITE_RUN_FROM_PACKAGE': '1'
+}
+var websiteLoadCertificates = empty(websiteLoadCertificateThumbprints) ? {} : {
+	'WEBSITE_LOAD_CERTIFICATES': websiteLoadCertificateThumbprints
 }
 var constantSettings = {
 	'APPINSIGHTS_INSTRUMENTATIONKEY': appInsightsInstrumentationKey
@@ -26,7 +30,7 @@ var constantSettings = {
 	'FUNCTIONS_EXTENSION_VERSION': '~3'
 	'FUNCTIONS_WORKER_RUNTIME': 'dotnet'
 	'NOOP_AUTHENTICATION_SECRET': ''
-	'CosmosDbSqlConnection': '@Microsoft.KeyVault(VaultName=${keyVaultName};SecretName=CosmosDbConnectionString)'
+	'AzureKeyVaultEndpoint': 'https://${keyVaultName}.vault.azure.net/'
 }
 var newSettings = {}
 
@@ -60,7 +64,7 @@ module funcAppSettingsDeployment 'api.version.appsettings.bicep' = {
 		functionAppName: func.name
 		defaultSettings: defaultSettings
 		existingSettings: list(existingSettings.id, '2020-10-01').properties
-		constantSettings: constantSettings
+		constantSettings: union(websiteLoadCertificates, constantSettings)
 		newSettings: newSettings
 	}
 }
