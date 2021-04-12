@@ -439,8 +439,9 @@ Constants.g.cs
 # B2C deployment files.
 src/b2c/Deploy
 
-# ARM file.
+# ARM/Bicep files.
 main.json
+parameters.local.json
 
 # Local settings
 local.settings.json

@@ -28,7 +28,7 @@ namespace OE.Api.Identity.Functions
 
 		[FunctionName(nameof(ProcessInvitationsAsync))]
 		public async Task ProcessInvitationsAsync(
-			[CosmosDBTrigger(Data.Constants.CosmosDb.DatabaseId, Data.Constants.CosmosDb.InvitationsContainerId, ConnectionStringSetting = "CosmosDbSqlConnection", LeaseCollectionName = "leases", CreateLeaseCollectionIfNotExists = true)] IReadOnlyList<Microsoft.Azure.Documents.Document> documents,
+			[CosmosDBTrigger(Data.Constants.CosmosDb.DatabaseId, Data.Constants.CosmosDb.InvitationsContainerId, ConnectionStringSetting = "CosmosDb:ConnectionString", LeaseCollectionName = "leases")] IReadOnlyList<Microsoft.Azure.Documents.Document> documents,
 			ILogger log
 		)
 		{

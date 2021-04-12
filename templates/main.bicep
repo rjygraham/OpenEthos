@@ -8,8 +8,21 @@ param identityApiVersions array
 param inboxApiVersions array
 param outboxApiVersions array
 param profileApiVersions array
-param apiOpenIdIssuer string
-param apiOpenIdClientId string
+param aadOpenIdConfigUrl string
+param aadOpenIdApimAudience string
+param aadOpenIdIssuer string
+param b2cOpenIdConfigUrl string
+param b2cOpenIdAudience string
+param b2cOpenIdIssuer string
+param aadApisClientId string
+@secure()
+param o365GraphTenantId string
+@secure()
+param o365GraphClientId string
+@secure()
+param o365GraphClientSecret string
+@secure()
+param o365GraphEmailSenderObjectId string
 
 var environmentName = '${appName}-${environment}'
 var sharedResourceGroupName = toUpper('${environmentName}-SHARED')
@@ -78,7 +91,16 @@ module regionDeployments 'region.bicep' = [for region in regions: {
 		profileApiVersions: profileApiVersions
 		apimPublisherEmail: 'admin@openethos.io'
 		apimPublisherName: 'OpenEthos'
-		apiOpenIdIssuer: apiOpenIdIssuer
-		apiOpenIdClientId: apiOpenIdClientId
+		aadOpenIdConfigUrl: aadOpenIdConfigUrl
+		aadOpenIdApimAudience: aadOpenIdApimAudience
+		aadOpenIdIssuer: aadOpenIdIssuer
+		b2cOpenIdConfigUrl: b2cOpenIdConfigUrl
+		b2cOpenIdAudience: b2cOpenIdAudience
+		b2cOpenIdIssuer: b2cOpenIdIssuer
+		aadApisClientId: aadApisClientId
+		o365GraphTenantId: o365GraphTenantId
+		o365GraphClientId: o365GraphClientId
+		o365GraphClientSecret: o365GraphClientSecret
+		o365GraphEmailSenderObjectId: o365GraphEmailSenderObjectId
 	}
 }]
