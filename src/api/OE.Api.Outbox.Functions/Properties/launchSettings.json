@@ -2,7 +2,7 @@
   "profiles": {
     "OE.Api.Outbox.Functions": {
       "commandName": "Project",
-      "commandLineArgs": "host start --port 7071 --pause-on-error"
+      "commandLineArgs": "host start --port 7071 --pause-on-error --verbose"
     }
   }
 }

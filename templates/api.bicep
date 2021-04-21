@@ -10,8 +10,9 @@ param apiName string
 param apiVersions array
 param serverFarmResourceId string
 param appInsightsInstrumentationKey string
-param apiOpenIdIssuer string
-param apiOpenIdClientId string
+param aadOpenIdIssuer string
+param aadApisClientId string
+param websiteLoadCertificateThumbprints string = ''
 
 @secure()
 param storageAccountConnectionString string
@@ -25,7 +26,7 @@ resource apiVersionSet 'Microsoft.ApiManagement/service/api-version-sets@2018-06
 	}
 }
 
-module apiVersion 'api-version.bicep' = [for version in apiVersions: {
+module apiVersion 'api.version.bicep' = [for version in apiVersions: {
   name: '${apiName}.api.${version}'
   dependsOn: [
     apiVersionSet
@@ -42,7 +43,8 @@ module apiVersion 'api-version.bicep' = [for version in apiVersions: {
     serverFarmResourceId: serverFarmResourceId
     storageAccountConnectionString: storageAccountConnectionString
     appInsightsInstrumentationKey: appInsightsInstrumentationKey
-    apiOpenIdIssuer: apiOpenIdIssuer
-		apiOpenIdClientId: apiOpenIdClientId
+    aadOpenIdIssuer: aadOpenIdIssuer
+		aadApisClientId: aadApisClientId
+    websiteLoadCertificateThumbprints: websiteLoadCertificateThumbprints
   }
 }]
