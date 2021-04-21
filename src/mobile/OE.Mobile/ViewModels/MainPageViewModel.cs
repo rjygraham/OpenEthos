@@ -55,7 +55,7 @@ namespace OE.Mobile.ViewModels
 			{
 				Device.BeginInvokeOnMainThread(() =>
 				{
-					IsAuthenticated = !string.IsNullOrEmpty(authenticationService.AccessToken);
+					// Do something here.
 				});
 			}
 		}
@@ -68,7 +68,7 @@ namespace OE.Mobile.ViewModels
 			{
 				Device.BeginInvokeOnMainThread(() =>
 				{
-					IsAuthenticated = !string.IsNullOrEmpty(authenticationService.AccessToken);
+					// Do something here.
 				});
 			}
 		}
@@ -76,12 +76,12 @@ namespace OE.Mobile.ViewModels
 		public AsyncCommand InvokeApiCommand { get; private set; }
 		private async Task ExecuteInvokeApiCommand()
 		{
-			var profileResponse = await profileApiService.GetProfile("69b918ec-69bb-489c-be71-2900e6a8cbe7").ConfigureAwait(false);
+			var profileResponse = await profileApiService.GetProfileAsync("69b918ec-69bb-489c-be71-2900e6a8cbe7").ConfigureAwait(false);
 
 			Device.BeginInvokeOnMainThread(() =>
 			{
 				Username = profileResponse.Username;
-				DisplayName = profileResponse.DisplayName;
+				DisplayName = profileResponse.Name["mul"];
 			});
 		}
 	}

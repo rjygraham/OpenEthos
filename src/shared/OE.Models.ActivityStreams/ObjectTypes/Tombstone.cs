@@ -21,7 +21,7 @@ namespace OE.Models.ActivityStreams
 		/// deleted.
 		/// </summary>
 		[JsonProperty("deleted")]
-		public DateTime? Deleted { get; set; }
+		public DateTimeOffset? Deleted { get; set; }
 
 		public Tombstone()
 		{
