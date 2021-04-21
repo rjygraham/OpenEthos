@@ -2,7 +2,7 @@
   "profiles": {
     "OE.Api.Identity.Functions": {
       "commandName": "Project",
-      "commandLineArgs": "host start --port 7072 --pause-on-error"
+      "commandLineArgs": "host start --port 7072 --pause-on-error --verbose"
     }
   }
 }

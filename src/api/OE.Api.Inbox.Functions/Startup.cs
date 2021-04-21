@@ -2,15 +2,15 @@
 using Microsoft.Azure.Functions.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
-using OE.Api.Profile;
+using OE.Api.Inbox.Functions;
 using System;
 using System.Reflection;
 
 [assembly: FunctionsStartup(typeof(Startup))]
 
-namespace OE.Api.Profile
+namespace OE.Api.Inbox.Functions
 {
-	public class Startup : FunctionsStartup
+	class Startup : FunctionsStartup
 	{
 		public override void ConfigureAppConfiguration(IFunctionsConfigurationBuilder builder)
 		{
