@@ -1,4 +1,4 @@
-﻿using Microsoft.ReverseProxy.Abstractions.Config;
+﻿using Yarp.ReverseProxy.Abstractions.Config;
 using OE.Api.Extensions;
 
 namespace OE.DevProxy.Transformations
@@ -12,9 +12,9 @@ namespace OE.DevProxy.Transformations
 			{
 				context.AddRequestTransform(transformContext =>
 				{
-					transformContext.ProxyRequest.Headers.Add(Constants.Headers.UserObjectId, "3fb8ee60-d151-4e40-9cb6-dc59e287bbbb");
-					transformContext.ProxyRequest.Headers.Add(Constants.Headers.UserPrincipalName, "rjygraham@openethos.io");
-					transformContext.ProxyRequest.Headers.Add(Constants.Headers.UserDisplayName, "Ryan Graham");
+					transformContext.ProxyRequest.Headers.Add(Constants.Headers.UserObjectId, "TODO: GET FROM USER-SECRETS");
+					transformContext.ProxyRequest.Headers.Add(Constants.Headers.UserPrincipalName, "TODO: GET FROM USER-SECRETS");
+					transformContext.ProxyRequest.Headers.Add(Constants.Headers.UserDisplayName, "TODO: GET FROM USER-SECRETS");
 					return default;
 				});
 			}	

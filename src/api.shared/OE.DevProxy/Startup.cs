@@ -5,7 +5,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
-using Microsoft.ReverseProxy.Abstractions;
+using Yarp.ReverseProxy.Abstractions;
 using OE.DevProxy.Config;
 using OE.DevProxy.Transformations;
 using System;
