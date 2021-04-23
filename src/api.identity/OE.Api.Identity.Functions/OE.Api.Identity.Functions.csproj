@@ -3,7 +3,8 @@
 		<TargetFramework>netcoreapp3.1</TargetFramework>
 		<AzureFunctionsVersion>v3</AzureFunctionsVersion>
 		<_FunctionsSkipCleanOutput>true</_FunctionsSkipCleanOutput>
-	</PropertyGroup>
+	  <UserSecretsId>07cc9a74-46c7-45e5-b0f3-f54e2e57b693</UserSecretsId>
+  </PropertyGroup>
 	<ItemGroup>
 		<PackageReference Include="Microsoft.NET.Sdk.Functions" Version="3.0.11" />
 		<PackageReference Include="Microsoft.Azure.Functions.Extensions" Version="1.1.0" />
@@ -17,12 +18,18 @@
 
 		<PackageReference Include="Microsoft.Azure.Cosmos" Version="3.17.0" />
 		<PackageReference Include="Microsoft.Azure.WebJobs.Extensions.CosmosDB" Version="3.0.9" />
+		
+		<PackageReference Include="Microsoft.Graph.Auth" Version="1.0.0-preview.6" />
+		<PackageReference Include="Microsoft.Graph.Beta" Version="0.38.0-preview" />
+		<PackageReference Include="Microsoft.IdentityModel.Tokens" Version="6.8.0" />
+		<PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="6.8.0" />
 	</ItemGroup>
 	<ItemGroup>
+		<ProjectReference Include="..\..\api.shared\OE.Api.Configuration\OE.Api.Configuration.csproj" />
+		<ProjectReference Include="..\..\api.shared\OE.Api.Data\OE.Api.Data.csproj" />
+		<ProjectReference Include="..\..\api.shared\OE.Api.Extensions\OE.Api.Extensions.csproj" />
+		<ProjectReference Include="..\..\api.shared\OE.Api.MicrosoftGraph\OE.Api.MicrosoftGraph.csproj" />
 		<ProjectReference Include="..\..\shared\OE.Models.ActivityStreams\OE.Models.ActivityStreams.csproj" />
-		<ProjectReference Include="..\OE.Api.Configuration\OE.Api.Configuration.csproj" />
-		<ProjectReference Include="..\OE.Api.Data\OE.Api.Data.csproj" />
-		<ProjectReference Include="..\OE.Api.Extensions\OE.Api.Extensions.csproj" />
 	</ItemGroup>
 	<ItemGroup>
 		<None Update="host.json">

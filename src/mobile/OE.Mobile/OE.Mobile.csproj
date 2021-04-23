@@ -24,7 +24,6 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\..\shared\OE.Models.ActivityStreams\OE.Models.ActivityStreams.csproj" />
-		<ProjectReference Include="..\..\shared\OE.Models\OE.Models.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>

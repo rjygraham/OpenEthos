@@ -17,10 +17,10 @@
 	  <PackageReference Include="Microsoft.Azure.Cosmos" Version="3.17.0" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\api.shared\OE.Api.Configuration\OE.Api.Configuration.csproj" />
+    <ProjectReference Include="..\..\api.shared\OE.Api.Data\OE.Api.Data.csproj" />
+    <ProjectReference Include="..\..\api.shared\OE.Api.Extensions\OE.Api.Extensions.csproj" />
     <ProjectReference Include="..\..\shared\OE.Models.ActivityStreams\OE.Models.ActivityStreams.csproj" />
-    <ProjectReference Include="..\OE.Api.Configuration\OE.Api.Configuration.csproj" />
-    <ProjectReference Include="..\OE.Api.Data\OE.Api.Data.csproj" />
-    <ProjectReference Include="..\OE.Api.Extensions\OE.Api.Extensions.csproj" />
   </ItemGroup>
   <ItemGroup>
     <None Update="host.json">
