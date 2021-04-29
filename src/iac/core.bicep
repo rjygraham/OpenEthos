@@ -3,7 +3,9 @@ targetScope = 'resourceGroup'
 param location string
 param environmentName string
 
-var cosmosName = '${environmentName}-cosmos'
+var sharedName = '${environmentName}-core'
+var cosmosName = '${sharedName}-cosmos'
+var keyVaultName = '${sharedName}-kvlt'
 
 resource cosmosDb 'Microsoft.DocumentDB/databaseAccounts@2020-06-01-preview' = {
   name: cosmosName
@@ -110,6 +112,22 @@ resource cosmosDb 'Microsoft.DocumentDB/databaseAccounts@2020-06-01-preview' = {
       }
     }
   }
+}
+
+resource keyVault 'Microsoft.KeyVault/vaults@2019-09-01' = {
+	name: keyVaultName
+	location: location
+	properties: {
+		sku: {
+			name: 'standard'
+			family: 'A'
+		}
+		tenantId: subscription().tenantId
+    accessPolicies: []
+    enablePurgeProtection: true
+    enableSoftDelete: true
+    enableRbacAuthorization: true
+	}
 }
 
 output cosmosDbName string = cosmosDb.name

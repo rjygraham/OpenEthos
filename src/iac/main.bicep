@@ -15,7 +15,6 @@ param b2cOpenIdConfigUrl string
 param b2cOpenIdAudience string
 param b2cOpenIdIssuer string
 param aadApisClientId string
-param idHintTokenSigningCertificateThumbprint string
 param idHintTokenIssuer string
 param idHintTokenClientId string
 param o365GraphTenantId string
@@ -23,18 +22,17 @@ param o365GraphClientId string
 @secure()
 param o365GraphClientSecret string
 param o365GraphEmailSenderObjectId string
-param identityApiLoadCertificateThumbprints string
 
 var environmentName = '${appName}-${environment}'
-var sharedResourceGroupName = toUpper('${environmentName}-SHARED')
+var coreResourceGroupName = toUpper('${environmentName}-CORE')
 var opsResourceGroupName = toUpper('${environmentName}-OPS')
 var regionMap = {
 	eastus: 'eus'
 	westus: 'wus'
 }
 
-resource sharedResourceGroup 'Microsoft.Resources/resourceGroups@2020-06-01' = {
-	name: sharedResourceGroupName
+resource coreResourceGroup 'Microsoft.Resources/resourceGroups@2020-06-01' = {
+	name: coreResourceGroupName
 	location: location
 }
 
@@ -43,8 +41,8 @@ resource opsResourceGroup 'Microsoft.Resources/resourceGroups@2020-06-01' = {
 	location: location
 }
 
-resource regionResourceGroups 'Microsoft.Resources/resourceGroups@2020-06-01' = [for region in regions: {
-	name: toUpper('${environmentName}-${regionMap[region]}')
+resource regionSharedResourceGroups 'Microsoft.Resources/resourceGroups@2020-06-01' = [for region in regions: {
+	name: toUpper('${environmentName}-${regionMap[region]}-CORE')
 	location: region
 }]
 
@@ -60,36 +58,31 @@ module opsDeployment 'ops.bicep' = {
 	}
 }
 
-module sharedDeployment 'shared.bicep' = {
-	name: 'shared'
+module coreDeployment 'core.bicep' = {
+	name: 'core'
 	dependsOn: [
-		sharedResourceGroup
+		coreResourceGroup
 	]
-	scope: resourceGroup(sharedResourceGroupName)
+	scope: resourceGroup(coreResourceGroupName)
 	params: {
 		location: location
 		environmentName: environmentName
 	}
 }
 
-module regionDeployments 'region.bicep' = [for region in regions: {
+module regionDeployments 'region.core.bicep' = [for region in regions: {
 	name: region
 	dependsOn: [
 		opsDeployment
-		regionResourceGroups
+		regionSharedResourceGroups
 	]
-	scope: resourceGroup(toUpper('${environmentName}-${regionMap[region]}'))
+	scope: resourceGroup(toUpper('${environmentName}-${regionMap[region]}-CORE'))
 	params: {
 		location: location
 		environmentRegionName: '${environmentName}-${regionMap[region]}'
-		sharedResourceGoupName: sharedResourceGroupName
+		sharedResourceGoupName: coreResourceGroupName
 		opsResourceGroupName: opsResourceGroupName
-		cosmosDbName: sharedDeployment.outputs.cosmosDbName
-		logAnalyticsName: opsDeployment.outputs.logAnalyticsName
-		identityApiVersions: identityApiVersions
-		inboxApiVersions: inboxApiVersions
-		outboxApiVersions: outboxApiVersions
-		profileApiVersions: profileApiVersions
+		cosmosDbName: coreDeployment.outputs.cosmosDbName
 		apimPublisherEmail: 'admin@openethos.io'
 		apimPublisherName: 'OpenEthos'
 		aadOpenIdConfigUrl: aadOpenIdConfigUrl
@@ -99,13 +92,11 @@ module regionDeployments 'region.bicep' = [for region in regions: {
 		b2cOpenIdAudience: b2cOpenIdAudience
 		b2cOpenIdIssuer: b2cOpenIdIssuer
 		aadApisClientId: aadApisClientId
-		idHintTokenSigningCertificateThumbprint: idHintTokenSigningCertificateThumbprint
 		idHintTokenIssuer: idHintTokenIssuer
 		idHintTokenClientId: idHintTokenClientId
 		o365GraphTenantId: o365GraphTenantId
 		o365GraphClientId: o365GraphClientId
 		o365GraphClientSecret: o365GraphClientSecret
 		o365GraphEmailSenderObjectId: o365GraphEmailSenderObjectId
-		identityApiLoadCertificateThumbprints: identityApiLoadCertificateThumbprints
 	}
 }]
